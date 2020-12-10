@@ -3,7 +3,7 @@
    Version: 2.0 XL
    Date: 11.02.2020
 
-   Hardware: Teensy 4.0, Waveshare CAN Board SN65HVD230, ILI9486 320x240 TFT with XPT2046 Touch, LM2596 DC/DC Converter - set 5.0 Volt out
+   Hardware: Teensy 4.0, Waveshare CAN Board SN65HVD230, Waveshare 4inch RPi LCD (C) ILI9486 with XPT2046 Touch, LM2596 DC/DC Converter - set 5.0 Volt out
    Car: Opel Astra H opc
    Interface 1: HSCAN 500 kBaud (Pin 6 and 14 on OBD connector)
    Interface 2: MSCAN  95 kBaud (Pin   and   on OBD connector)
