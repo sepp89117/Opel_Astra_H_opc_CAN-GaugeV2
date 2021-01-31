@@ -221,6 +221,8 @@ bool waschwasserLeerOk = false;
 bool dispBufReady = false;
 bool graphHold = false;
 int lcdBright = 255;
+bool firstBoostValRec = true;
+int firstBoostVal = 100; //atmosperic pressure, will be corrected by first value received
 
 byte testByte01;
 byte testByte02;
@@ -304,20 +306,20 @@ void setup() {
 
   //init Buttons
   //Button(int x, int y, int w, int h, char *text, uint16_t textColor, const short unsigned int *bgImage)
-  btnDTCs = Button(0, 285, 84, 43, (char*)"DTCs", backColor, styleBtn);
-  btnGraph = Button(90, 285, 84, 43, (char*)"Graph", backColor, styleBtn);
-  btnMax = Button(180, 285, 84, 43, (char*)"MaxV", backColor, styleBtn);
-  btnAcc = Button(270, 285, 84, 43, (char*)"AccM", backColor, styleBtn);
-  btnFuel = Button(360, 285, 84, 43, (char*)"Fuel", backColor, styleBtn);
-  btnResetAcc = Button(90, 285, 84, 43, (char*)"Reset", backColor, styleBtn);
-  btnBack = Button(0, 0, 84, 43, (char*)"Back", backColor, styleBtn);
-  btnHome = Button(0, 285, 84, 43, (char*)"Home", backColor, styleBtn);
-  btnDelDtc = Button(90, 0, 84, 43, (char*)"Clear", backColor, styleBtn);
-  btnResetMax = Button(90, 285, 84, 43, (char*)"Reset", backColor, styleBtn);
-  btnPlus = Button(355, 180, 84, 43, (char*)"+", backColor, styleBtn);
-  btnMinus = Button(355, 225, 84, 43, (char*)"-", backColor, styleBtn);
-  btnHold = Button(90, 285, 84, 43, (char*)"Hold", backColor, styleBtn);
-  btnGraph2 = Button(180, 285, 84, 43, (char*)">>", backColor, styleBtn);
+  btnDTCs = Button(0, 285, 84, 34, (char*)"DTCs", backColor, styleBtn);
+  btnGraph = Button(90, 285, 84, 34, (char*)"Graph", backColor, styleBtn);
+  btnMax = Button(180, 285, 84, 34, (char*)"MaxV", backColor, styleBtn);
+  btnAcc = Button(270, 285, 84, 34, (char*)"AccM", backColor, styleBtn);
+  btnFuel = Button(360, 285, 84, 34, (char*)"Fuel", backColor, styleBtn);
+  btnResetAcc = Button(90, 285, 84, 34, (char*)"Reset", backColor, styleBtn);
+  btnBack = Button(0, 0, 84, 34, (char*)"Back", backColor, styleBtn);
+  btnHome = Button(0, 285, 84, 34, (char*)"Home", backColor, styleBtn);
+  btnDelDtc = Button(90, 0, 84, 34, (char*)"Clear", backColor, styleBtn);
+  btnResetMax = Button(90, 285, 84, 34, (char*)"Reset", backColor, styleBtn);
+  btnPlus = Button(355, 180, 84, 34, (char*)"+", backColor, styleBtn);
+  btnMinus = Button(355, 225, 84, 34, (char*)"-", backColor, styleBtn);
+  btnHold = Button(90, 285, 84, 34, (char*)"Hold", backColor, styleBtn);
+  btnGraph2 = Button(180, 285, 84, 34, (char*)">>", backColor, styleBtn);
   btnLcdBright = Button(225, 0, 30, 30, (char*)"", backColor, btnBright);
 
   //init Homeview
@@ -353,15 +355,15 @@ void spiThread() {
     checkTouch();
 
     //    //---DEBUG VALS---
-    //    if(boost >= 160) boost = 0;
-    //    boost += boost/8 + 1;
-    //    if(boost > rMAXboost) rMAXboost = boost;
-    //    addValue(boostArray, boost);
-    //    if(maf >= 900) maf = 0;
-    //    maf += maf/8 +1;
-    //    addValue(mafArray, maf);
-    //    if(iat >= 70) iat = 0;
-    //    iat++;
+//        if(boost >= 160) boost = 0;
+//        boost += boost/8 + 1;
+//        if(boost > rMAXboost) rMAXboost = boost;
+//        addValue(boostArray, boost);
+//        if(maf >= 900) maf = 0;
+//        maf += maf/8 +1;
+//        addValue(mafArray, maf);
+//        if(iat >= 65) iat = 0;
+//        iat++;
     //    if(speed >= 260) speed = 0, threads.delay(50);
     //    speed++;
     //    speedHandle();
@@ -1434,7 +1436,8 @@ void handleData500Msg(const CAN_message_t &can_MsgRx) {
       case 0x12:
         maf = ((can_MsgRx.buf[2] * 256.0f) + can_MsgRx.buf[3]) / 100.0f * 3.6f;
         mafVolt = can_MsgRx.buf[1] / 51.0f;
-        boost = can_MsgRx.buf[7] - 101;
+        if(firstBoostValRec) firstBoostVal = can_MsgRx.buf[7], firstBoostValRec = false;
+        boost = can_MsgRx.buf[7] - firstBoostVal;
         power = maf * 0.383;
 
         addValue(mafArray, maf);
