@@ -1,7 +1,7 @@
 /*
    Autor: Sebastian Balzer
-   Version: 2.0 XL
-   Date: 31.01.2021
+   Version: 2.2 XL + PC-Out
+   Date: 27.03.2021
 
    Hardware: Teensy 4.0, Waveshare CAN Board SN65HVD230, Waveshare 4inch RPi LCD (C) ILI9486 with XPT2046 Touch, LM2596 DC/DC Converter - set 5.0 Volt out
    Car: Opel Astra H opc
@@ -14,6 +14,7 @@
 #include <XPT2046_Touchscreen.h>
 #include <FlexCAN_T4.h>
 #include "TeensyThreads.h"
+#include <EEPROM.h>
 #include "ILI9486_t3n.h"
 #include "ili9486_t3n_font_Arial.h"
 #include "ili9486_t3n_font_ArialBold.h"
@@ -23,24 +24,26 @@
 
 class info {
   public:
-    String Text;
+    char* Text;
     uint16_t TextColor;
     int Prio;
-    int Dur;
+    unsigned long Dur;
+    bool firstDrawn = false;
+    bool enabled = true;
 
-    info(String text, uint16_t color, int prio, int dur) {
-      if (text.length() >= 27) { //wenn Text zu lang für Infozeile ist wird er gekürzt
-        Text = text.substring(0, 26);
-      } else {
-        Text = text;
-      }
+    info(char* text, uint16_t color, int prio, int dur) {
+      //if (sizeof(text) >= 27) { //wenn Text zu lang für Infozeile ist wird er gekürzt
+      //Text = text.substring(0, 26);
+      //} else {
+      Text = text;
+      //}
       TextColor = color;
       Prio = prio;
       Dur = dur;
     };
 
     info() {
-      Text = "";
+      Text = (char*)"";
       TextColor = 0;
       Prio = 0;
       Dur = 0;
@@ -110,7 +113,7 @@ const int buzzer = 4;
 #define MAX_VIEW   2
 #define ACC_VIEW   3
 #define GRAPH_VIEW  4
-#define GRAPH2_VIEW  5
+#define Ignition_VIEW  5
 #define FUEL_VIEW  6
 int actualView;
 
@@ -126,7 +129,7 @@ int iat = 0;
 int ambientTemp = 0;
 float maf = 0.0f;
 float mafVolt = 0.0f;
-int ign = 0;
+float ign = 0;
 int sft = 0;
 int fcs = 0;
 int rpm = 0;
@@ -135,6 +138,10 @@ float inj = 0.0f;
 bool isMilOn = false;
 float aat = 0.0f; //Außentemp. (CAN 33,3kbps)
 int distanceBehind = 0;
+byte knockRet1;
+byte knockRet2;
+byte knockRet3;
+byte knockRet4;
 //berechnete Daten
 float absolutConsume;
 int injAuslast = 0;
@@ -149,6 +156,7 @@ unsigned long EngineStartTime = 0;
 unsigned long lastSpeedTime = 0;
 unsigned long lastConsumeTime = 0;
 double strecke = 0;
+double odoMeter = 0;
 float tankInhalt = 0;
 //Alte Motordaten-Variablen
 float oldvBatt = 0.0f;
@@ -175,7 +183,7 @@ int rMAXect = 0;
 int rMAXboost = 0;
 int rMAXiat = 0;
 int rMAXmaf = 0;
-int rMAXign = 0;
+float rMAXign = 0.0f;
 int rMAXrpm = 0;
 int rMAXspeed = 0;
 float rMAXinj = 0.0f;
@@ -201,7 +209,7 @@ int oldactSpeed;
 int actSpeed;
 
 //Programm-Variablen
-char bcVersion[7] = "2.0 XL";
+char bcVersion[7] = "2.2 XL";
 const int arrayLength = 39;
 int boostArray[arrayLength];
 int mafArray[arrayLength];
@@ -212,22 +220,19 @@ bool response = false;
 int noResponseCount = 0;
 info actualInfo;
 info oldInfo;
-int infoWritten;
+unsigned long infoWritten;
 bool dashViewLoad = true;
 bool answered = false;
 char bufInt[12]; //global variable created because malloc cannot be used here
-char bufFloat[10]; //global variable created because malloc cannot be used here
+char bufFloat[12]; //global variable created because malloc cannot be used here
 bool waschwasserLeerOk = false;
 bool dispBufReady = false;
 bool graphHold = false;
 int lcdBright = 255;
 bool firstBoostValRec = true;
 int firstBoostVal = 100; //atmosperic pressure, will be corrected by first value received
+int engineStarts = 0;
 
-byte testByte01;
-byte testByte02;
-byte testByte03;
-byte testByte04;
 
 //Buttons
 Button btnDTCs;
@@ -243,7 +248,7 @@ Button btnPlus;
 Button btnMinus;
 Button btnHold;
 Button btnFuel;
-Button btnGraph2;
+Button btnIgnition;
 Button btnLcdBright;
 
 void setup() {
@@ -256,7 +261,6 @@ void setup() {
   tft.fillScreen(backColor);
   tft.useFrameBuffer(1);
   tft.setRotation(3);
-  Serial.println("TFT init okay");
 
   //init CAN500
   can500.begin();
@@ -295,9 +299,9 @@ void setup() {
   //init touch
   ts.setRotation(3);
   if (!ts.begin()) {
-    Serial.println("Couldn't start touchscreen controller");
+    //Serial.println("Couldn't start touchscreen controller");
   } else {
-    Serial.println("Touchscreen init okay");
+    //Serial.println("Touchscreen init okay");
   }
 
   analogWrite(3, lcdBright); //Disp. LED on
@@ -319,8 +323,15 @@ void setup() {
   btnPlus = Button(355, 180, 84, 34, (char*)"+", backColor, styleBtn);
   btnMinus = Button(355, 225, 84, 34, (char*)"-", backColor, styleBtn);
   btnHold = Button(90, 285, 84, 34, (char*)"Hold", backColor, styleBtn);
-  btnGraph2 = Button(180, 285, 84, 34, (char*)">>", backColor, styleBtn);
+  btnIgnition = Button(180, 285, 84, 34, (char*)"Ign", backColor, styleBtn);
   btnLcdBright = Button(225, 0, 30, 30, (char*)"", backColor, btnBright);
+
+  //initialisiere EEPROM auf 1 Start
+  //  byte bytes[2];
+  //  bytes[0] = (engineStarts + 1) & 0xFF;
+  //  bytes[1] = ((engineStarts + 1) >> 8) & 0xFF;
+  //  EEPROM.write(4, bytes[0]);
+  //  EEPROM.write(3, bytes[1]);
 
   //init Homeview
   tft.fillScreen(backColor);
@@ -333,6 +344,12 @@ void setup() {
 
   //starte Kommunikation mit ECU
   tech2ThreadID = threads.addThread(tech2);
+
+  engineStarts = EEPROM.read(3) * 256 + EEPROM.read(4);
+
+  if (engineStarts % 100 == 0) { //ca. alle 2000 km (100 * ca. 20 km) Meldung geben
+    actualInfo = info((char*)"Fluessigkeiten pruefen !", ILI9486_RED, 5, 10000);
+  }
 }
 
 void loop(void) {
@@ -355,15 +372,15 @@ void spiThread() {
     checkTouch();
 
     //    //---DEBUG VALS---
-//        if(boost >= 160) boost = 0;
-//        boost += boost/8 + 1;
-//        if(boost > rMAXboost) rMAXboost = boost;
-//        addValue(boostArray, boost);
-//        if(maf >= 900) maf = 0;
-//        maf += maf/8 +1;
-//        addValue(mafArray, maf);
-//        if(iat >= 65) iat = 0;
-//        iat++;
+    //        if(boost >= 160) boost = 0;
+    //        boost += boost/8 + 1;
+    //        if(boost > rMAXboost) rMAXboost = boost;
+    //        addValue(boostArray, boost);
+    //        if(maf >= 900) maf = 0;
+    //        maf += maf/8 +1;
+    //        addValue(mafArray, maf);
+    //        if(iat >= 65) iat = 0;
+    //        iat++;
     //    if(speed >= 260) speed = 0, threads.delay(50);
     //    speed++;
     //    speedHandle();
@@ -433,13 +450,13 @@ void checkTouch() {
           graphHold = false;
           actualView = HOME_VIEW;
           switchView();
-        } else if (btnGraph2.isTouched(p.x, p.y)) {
+        } else if (btnIgnition.isTouched(p.x, p.y)) {
           graphHold = false;
-          actualView = GRAPH2_VIEW;
+          actualView = Ignition_VIEW;
           switchView();
         }
         break;
-      case GRAPH2_VIEW:
+      case Ignition_VIEW:
         if (btnHold.isTouched(p.x, p.y)) {
           graphHold = !graphHold;
           threads.delay(250); //avoids bouncing
@@ -533,14 +550,15 @@ void displayData() {
     if (actualView == HOME_VIEW) {
       drawHomeView();
       askInfo(); //Zeigt Infofeld falls notwendig
+      drawInfo();
     } else if (actualView == GRAPH_VIEW) {
       //drawInfo(actualInfo);
       drawGraphView();
-      askInfo(); //Zeigt Infofeld falls notwendig
-    } else if (actualView == GRAPH2_VIEW) {
+      //askInfo(); //Zeigt Infofeld falls notwendig
+    } else if (actualView == Ignition_VIEW) {
       //drawInfo(actualInfo);
-      drawGraph2View();
-      askInfo(); //Zeigt Infofeld falls notwendig
+      drawIgnitionView();
+      //askInfo(); //Zeigt Infofeld falls notwendig
     } else if (actualView == FC_VIEW) {
       //Fehlercodes anzeigen
       threads.delay(500);
@@ -575,10 +593,10 @@ void switchView() {
   } else if (actualView == GRAPH_VIEW) {
     btnHome.drawButton(true, tft);
     btnHold.drawButton(true, tft);
-    btnGraph2.drawButton(true, tft);
+    btnIgnition.drawButton(true, tft);
     drawGraphView();
 
-  } else if (actualView == GRAPH2_VIEW) {
+  } else if (actualView == Ignition_VIEW) {
     btnHome.drawButton(true, tft);
     btnHold.drawButton(true, tft);
     drawGraphView();
@@ -687,13 +705,21 @@ void drawMaxView() {
   tft.setCursor(270, y);
   tft.println("%");
 
+  //  y += 21;
+  //  tft.setCursor(2, y);
+  //  tft.println("Einspritzzeit");
+  //  tft.setCursor(215, y);
+  //  tft.println(rMAXinj);
+  //  tft.setCursor(270, y);
+  //  tft.println("ms");
+
   y += 21;
   tft.setCursor(2, y);
-  tft.println("Einspritzzeit");
+  tft.println("Motorstarts");
   tft.setCursor(215, y);
-  tft.println(rMAXinj);
+  tft.println(engineStarts);
   tft.setCursor(270, y);
-  tft.println("ms");
+  tft.println("Starts");
 
   y += 21;
   tft.setCursor(2, y);
@@ -825,7 +851,7 @@ void drawGraphView() {
   }
 }
 
-void drawGraph2View() {
+void drawIgnitionView() {
   tft.fillRect(0, 0, 480, 320 - 43, backColor);
 
   tft.setTextColor(foreColor);
@@ -845,41 +871,13 @@ void drawGraph2View() {
   tft.print(aat, 1);
   tft.print(" *C");
 
-  tft.setCursor(0, 35);
-  tft.print("Byte 4= ");
-  tft.print(testByte01, DEC);
+  //drawBar(int x, int y, char *title, int vMin, int vMax, int vYellow, int vRed, float value)
+  drawBar(10, 35, (char*)"IAA [*CA]", -4, 22, 16, 18, ign); //IAA = Ignition Advance Angle
 
-  tft.setCursor(0, 60);
-  tft.print("Byte 5= ");
-  tft.print(testByte02, DEC);
-
-  tft.setCursor(0, 85);
-  tft.print("Byte 6= ");
-  tft.print(testByte03, DEC);
-
-  tft.setCursor(0, 110);
-  tft.print("Byte 7= ");
-  tft.print(testByte04, DEC);
-
-  //--------- First Row Y = 33
-  //  if(!graphHold){
-  //  //drawGraph(int x, int y, int w, int h, int vmin, int vmax, char *title,        int *values)
-  //    drawGraph(0,   33,    238,   119,   0,        160,      (char*)"BOOST kPa", boostArray); //Ladedruck
-  //  }
-  //
-  //  if(!graphHold){
-  //  //drawGraph(int x, int y, int w, int h, int vmin, int vmax, char *title,        int *values)
-  //    drawGraph(241,   33,    238,   119,   0,        160,      (char*)"BOOST kPa", boostArray); //Ladedruck
-  //  }
-  //
-  //  //--------- Second Row Y = 156
-  //  if(!graphHold){
-  //    drawGraph(0, 156, 238, 119, 0, 900, (char*)"AIR FLOW kg/h", mafArray); //Ladedruck
-  //  }
-  //
-  //  if(!graphHold){
-  //    drawGraph(241, 156, 238, 119, 0, 900, (char*)"AIR FLOW kg/h", mafArray); //Ladedruck
-  //  }
+  drawBar(109, 35, (char*)"KR1 [*CA]", 0, 18, 3, 5, knockRet1); //KRx = Knock Retard Angle Cylinder x
+  drawBar(208, 35, (char*)"KR2 [*CA]", 0, 18, 3, 5, knockRet2); //KRx = Knock Retard Angle Cylinder x
+  drawBar(307, 35, (char*)"KR3 [*CA]", 0, 18, 3, 5, knockRet3); //KRx = Knock Retard Angle Cylinder x
+  drawBar(406, 35, (char*)"KR4 [*CA]", 0, 18, 3, 5, knockRet4); //KRx = Knock Retard Angle Cylinder x
 }
 
 void drawAccView() {
@@ -985,33 +983,42 @@ void drawFuelView() {
 //-------------------------------------------------------------//
 //--------------------------InfoPopUp--------------------------//
 //-------------------------------------------------------------//
-void drawInfo(info theInfo) {
-  if (theInfo.Prio >= oldInfo.Prio || (int)millis() >= oldInfo.Dur + infoWritten) { //wenn neu info-prio höher als alte info-prio, oder alte Info abgelaufen
-    //    if (actualView == DATA_VIEW && theInfo != oldInfo) { //wenn homeView & neue Info
-    //      oldInfo = theInfo;
-    //      tft.fillRect(0, 43, 320, 20, backColor);
-    //      tft.setFont(Arial_16);
-    //      tft.setCursor(0, 43);
-    //      tft.setTextColor(theInfo.TextColor);
-    //      tft.print(theInfo.Text);
-    //      infoWritten = millis();
-    //    }
+void drawInfo() {
+  if (actualInfo.Prio >= oldInfo.Prio || millis() - infoWritten >= oldInfo.Dur) { //wenn neu info-prio höher als alte info-prio, oder alte Info abgelaufen
+    if (actualView == HOME_VIEW) { //wenn homeView & neue Info // && theInfo != oldInfo
+      oldInfo = actualInfo;
+      if (actualInfo.enabled) {
+        tft.setFont(Arial_20);
+        int pxLen = tft.strPixelLen(actualInfo.Text);
+        tft.fillRoundRect(230 - (pxLen / 2), 140, pxLen + 20, 40, 5, foreColor);
+        tft.setTextColor(actualInfo.TextColor);
+        tft.setFont(Arial_20);
+        tft.setCursor(240 - (pxLen / 2), 150); //middle screen
+        tft.print(actualInfo.Text);
+
+        if (!actualInfo.firstDrawn) {
+          infoWritten = millis();
+          actualInfo.firstDrawn = true;
+          //Serial.print("Info drawn at ");
+          //Serial.println(infoWritten);
+        }
+
+        if (millis() - infoWritten >= actualInfo.Dur) {
+          actualInfo.enabled = false;
+          tft.fillRect(0, 140, 480, 40, backColor);
+          //Serial.print("Info disabled at ");
+          //Serial.println(millis());
+        }
+      }
+    }
   }
 }
 
 void askInfo() {
   //Wichtige Info vorhanden? Dann zeige Info
-  if (waschwasserLeer && !waschwasserLeerOk) drawInfoWindow((char*)"Waschwasser leer !");
-}
-
-void drawInfoWindow(char* text) {
-  tft.setFont(Arial_20);
-  int pxLen = tft.strPixelLen(text);
-  tft.fillRoundRect(150 - (pxLen / 2), 100, pxLen + 20, 40, 5, foreColor);
-  tft.setTextColor(ILI9486_RED);
-  tft.setFont(Arial_20);
-  tft.setCursor(160 - (pxLen / 2), 110); //middle screen
-  tft.print(text);
+  if (waschwasserLeer && !waschwasserLeerOk) {
+    actualInfo = info((char*)"Waschwasser leer !", foreColor, 3, 500);
+  }
 }
 
 //-------------------------------------------------------------//
@@ -1066,6 +1073,7 @@ void speedHandle() {
 
   if (EngineStartTime > 0) { //Motor Läuft, Strecke berechnen
     double span = millis() - lastSpeedTime; //Zeit zwischen zwei Geschwindigkeitsangaben
+    odoMeter += (double)actSpeed / 3600000.0d * span;
     strecke += (double)actSpeed / 3600000.0d * span;
     lastSpeedTime = millis();
   }
@@ -1308,6 +1316,44 @@ void gtrMeter(float value, int vmin, int vmax, int x, int y, char *units, int vC
   }
 }
 
+void drawBar(int x, int y, char *title, int vMin, int vMax, int vYellow, int vRed, float value) {
+  float graphHeight = 240.0f;
+  float graphWidth = 65.0f;
+  float deltaMinMax = abs(vMax - vMin);
+  float stepWidth = (graphHeight - 26.0f) / deltaMinMax;
+  float divisors = 6.0f;
+
+  tft.drawLine(x + 23, y + 23, x + 23, y + graphHeight - 5, foreColor); //Y-Left-Line
+  tft.drawLine(x + 23, y + graphHeight - 5, x + graphWidth, y + graphHeight - 5, foreColor); //X-Bottom-Line
+
+  //Title
+  tft.setTextColor(foreColor);
+  tft.setFont(Arial_12_Bold);
+  int tXsize = tft.strPixelLen(title);
+  tft.setCursor(x + graphWidth / 2 - tXsize / 2, y);
+  tft.print(title);
+
+  //Scale values and divisors
+  tft.setFont(Arial_10);
+  for (int i = 0; i < divisors + 1; i++) {
+    int scaleValue = (deltaMinMax / divisors * i) + vMin;
+    tXsize = tft.strPixelLen(intToChar(scaleValue));
+    tft.setCursor(x + 17 - tXsize, y + graphHeight - 10 - (i * (graphHeight - 28) / divisors));
+    tft.print(scaleValue);
+
+    tft.drawLine(x + 19, y + graphHeight - 5 - (i * (graphHeight - 28) / divisors), x + 22, y + graphHeight - 5 - (i * (graphHeight - 28) / divisors), foreColor); //Y-Divisor
+  }
+
+  //Bar
+  tft.fillRect(x + 25, y + (graphHeight - 5) + -1 * ((value - vMin) * stepWidth), graphWidth - 25, (value - vMin) * stepWidth, 0x07E0); //green bar
+
+  if (value >= vYellow) {
+    tft.fillRect(x + 25, y + (graphHeight - 5) + -1 * ((value - vMin) * stepWidth), graphWidth - 25, ((value - vMin) * stepWidth) - ((vYellow - vMin) * stepWidth), 0xFFE0); //yellow bar
+  }
+  if (value >= vRed) {
+    tft.fillRect(x + 25, y + (graphHeight - 5) + -1 * ((value - vMin) * stepWidth), graphWidth - 25, ((value - vMin) * stepWidth) - ((vRed - vMin) * stepWidth), 0xF800); //red bar
+  }
+}
 //-------------------------------------------------------------//
 //---------------------------Helpers---------------------------//
 //-------------------------------------------------------------//
@@ -1318,7 +1364,17 @@ char* intToChar(int value) {
 
 char* floatToChar(float value, int decis) {
   //if (decis < 1) decis = 1;
-  byte len = 3 + decis - 1; if (value >= 10) len = 4 + decis - 1; if (value >= 100) len = 5 + decis - 1; if (value >= 1000) len = 6 + decis - 1; if (value < 0) len = 4 + decis - 1;  if (value <= -10) len = 5 + decis - 1; if (value <= -100) len = 6 + decis - 1; if (value <= -1000) len = 7 + decis - 1;
+  byte len = 3 + decis - 1;
+  if (value >= 10) len = 4 + decis - 1;
+  if (value >= 100) len = 5 + decis - 1;
+  if (value >= 1000) len = 6 + decis - 1;
+  if (value >= 10000) len = 7 + decis - 1;
+  if (value >= 100000) len = 8 + decis - 1;
+  if (value < 0) len = 4 + decis - 1;
+  if (value <= -10) len = 5 + decis - 1;
+  if (value <= -100) len = 6 + decis - 1;
+  if (value <= -1000) len = 7 + decis - 1;
+
   dtostrf(value, len, decis, bufFloat);
   return bufFloat;
 }
@@ -1365,21 +1421,21 @@ void tech2() {
 
   while (1) { //Thread-Schleife
     if (!ecuConnected) { //wenn nicht verbunden, sende "7E0 01 20 0 0 0 0 0 0" bis "7E8 01 60 0 0 0 0 0 0" geantwortet wird
-      Serial.println("Nicht verbunden.");
+      //Serial.println("Nicht verbunden.");
       while (ecuConnected == false) {//Solange nicht verbunden-Schleife
-        Serial.println("Sende Verbindungsanfrage...");
+        //Serial.println("Sende Verbindungsanfrage...");
 
-        info thisActualInfo("Sende Verbindungsanfrage...", foreColor, 3, 500);
-        actualInfo = thisActualInfo;
+        //        info thisActualInfo((char*)"Sende Verbindungsanfrage...", 0x0000, 3, 500);
+        //        actualInfo = thisActualInfo;
 
         sendEcuData(0x01, 0x20, 0, 0, 0, 0, 0, 0);
         threads.delay(500);
 
         if (ecuConnected) {
-          Serial.println("Verbunden mit ECU.");
+          //Serial.println("Verbunden mit ECU.");
 
-          info thisActualInfo("Verbunden mit ECU.", foreColor, 1, 500);
-          actualInfo = thisActualInfo;
+          //info thisActualInfo("Verbunden mit ECU.", foreColor, 1, 500);
+          //actualInfo = thisActualInfo;
 
           threads.delay(15); //Warte 15ms, danach wird die Liste konfiguriert
           //sendingTime = 0;
@@ -1387,9 +1443,9 @@ void tech2() {
       }
     } else { //wenn verbunden
       if (listSet == false) { //wenn Datenliste noch nicht konfiguriert
-        sendEcuData(0x10, 0x09, 0xAA, 0x04, 0x10, 0x11, 0x12, 0x16); //Pakete 10, 11, 12, 16
+        sendEcuData(0x10, 0x0C, 0xAA, 0x04, 0x10, 0x11, 0x12, 0x16); //Pakete 10, 11, 12, 16
         threads.delay(15); //Warte 15ms
-        sendEcuData(0x21, 0x14, 0x19, 0x15, 0x00, 0x00, 0x00, 0x00); //Pakete 14, 19, 3
+        sendEcuData(0x21, 0x14, 0x19, 0x15, 0x13, 0x18, 0x17, 0x00); //Pakete 14, 19, 3, 15, 13, 18, 17
         listSet = true;
 
         //Starte Herzschlag / Verbindungsüberwachung
@@ -1407,6 +1463,13 @@ void tech2() {
 
 void handleData500Msg(const CAN_message_t &can_MsgRx) {
   if (can_MsgRx.id == CANID_DATAREPLY) { //Motordaten empfangen von 0x5E8
+    for (int i = 0; i < 8; i++) {
+      //Serial.write((uint8_t)can_MsgRx.buf[i]);
+      Serial.print(can_MsgRx.buf[i]);
+      if (i < 7)Serial.print(",");
+    }
+    Serial.println();
+
     switch (can_MsgRx.buf[0]) { //Datenpaketnummer
       case 0x03:
         isMilOn = can_MsgRx.buf[7];
@@ -1419,7 +1482,16 @@ void handleData500Msg(const CAN_message_t &can_MsgRx) {
         speedHandle();
 
         if (rpm > rMAXrpm)rMAXrpm = rpm;
-        if (rpm > 0 && EngineStartTime == 0) EngineStartTime = millis();
+        if (rpm > 0 && EngineStartTime == 0) {
+          EngineStartTime = millis();
+
+          byte bytes[2];
+          bytes[0] = (engineStarts + 1) & 0xFF;
+          bytes[1] = ((engineStarts + 1) >> 8) & 0xFF;
+
+          EEPROM.write(4, bytes[0]);
+          EEPROM.write(3, bytes[1]);
+        }
         if (speed > rMAXspeed)rMAXspeed = speed;
 
         break;
@@ -1436,7 +1508,7 @@ void handleData500Msg(const CAN_message_t &can_MsgRx) {
       case 0x12:
         maf = ((can_MsgRx.buf[2] * 256.0f) + can_MsgRx.buf[3]) / 100.0f * 3.6f;
         mafVolt = can_MsgRx.buf[1] / 51.0f;
-        if(firstBoostValRec) firstBoostVal = can_MsgRx.buf[7], firstBoostValRec = false;
+        if (firstBoostValRec) firstBoostVal = can_MsgRx.buf[7], firstBoostValRec = false;
         boost = can_MsgRx.buf[7] - firstBoostVal;
         power = maf * 0.383;
 
@@ -1449,12 +1521,7 @@ void handleData500Msg(const CAN_message_t &can_MsgRx) {
         break;
 
       case 0x16:
-        ign = can_MsgRx.buf[2] - 36;
-
-        testByte01 = can_MsgRx.buf[4];
-        testByte02 = can_MsgRx.buf[5];
-        testByte03 = can_MsgRx.buf[6];
-        testByte04 = can_MsgRx.buf[7];
+        ign = (can_MsgRx.buf[2] - 36.0f) / 10.0f;
 
         if (ign > rMAXign)rMAXign = ign;
         break;
@@ -1469,6 +1536,14 @@ void handleData500Msg(const CAN_message_t &can_MsgRx) {
         getConsum();
         break;
 
+      case 0x18:
+        //Klopfregelung
+        knockRet1 = can_MsgRx.buf[1];
+        knockRet2 = can_MsgRx.buf[2];
+        knockRet3 = can_MsgRx.buf[3];
+        knockRet4 = can_MsgRx.buf[4];
+        break;
+
       case 0x19:
         //Lambdasonde
         sft = (can_MsgRx.buf[1] - 128.0f) / 1.28;
@@ -1476,6 +1551,12 @@ void handleData500Msg(const CAN_message_t &can_MsgRx) {
 
       case 0x15:
         tankInhalt = (can_MsgRx.buf[7] / 2.55f - can_MsgRx.buf[6] / 256.0f);
+        if (tankInhalt <= 5.0f) {
+          actualInfo = info((char*)"Kraftstoffstand niedrig!", ILI9486_RED, 3, 5000);
+        }
+
+
+
         break;
 
       case 0x81:
@@ -1578,17 +1659,6 @@ void handleData33Msg(const CAN_message_t &can_MsgRx) {
     }
   } else if (can_MsgRx.id == 0x445) { //Außentemp
     aat = can_MsgRx.buf[1] / 2.0f - 40.0f;
-
-    //    Serial.println(can_MsgRx.id, HEX);
-    //    Serial.print(", ");
-    //    Serial.print(can_MsgRx.buf[0]);
-    //    Serial.print(can_MsgRx.buf[1]);
-    //    Serial.print(can_MsgRx.buf[2]);
-    //    Serial.print(can_MsgRx.buf[3]);
-    //    Serial.print(can_MsgRx.buf[4]);
-    //    Serial.print(can_MsgRx.buf[5]);
-    //    Serial.print(can_MsgRx.buf[6]);
-    //    Serial.println(can_MsgRx.buf[7]);
   } else if (can_MsgRx.id == 0x430) { //Info-Signale
     // 430 62  FF  FF  0 0 0 0 0 33 R-Gang drin, alles frei (Byte02 = Nähe)
     if (can_MsgRx.buf[0] == 0x62) { //R-Gang drin
@@ -1716,12 +1786,9 @@ void heartBeat() {
 
     if (response == false) { //alles zurücksetzen
       noResponseCount++;
-      Serial.println("Keine Antwort von ECU zum " + (String)noResponseCount + ". mal!");
+      //Serial.println("Keine Antwort von ECU zum " + (String)noResponseCount + ". mal!");
       if (noResponseCount >= 6) {
-        Serial.println("Verbindung getrennt!");
-
-        info thisActualInfo("Verbindung getrennt!", foreColor, 0, 500);
-        actualInfo = thisActualInfo;
+        //Serial.println("Verbindung getrennt!");
 
         ect = 0;
         boost = 0.0;
@@ -1766,7 +1833,8 @@ void sendEcuData(uint8_t byte0, uint8_t byte1, uint8_t byte2, uint8_t byte3, uin
 
   //send request
   if (!can500.write(TxMsg)) {
-    Serial.println("Senden fehlgeschlagen");
+    //Serial.println("Senden fehlgeschlagen");
+    actualInfo = info((char*)"ECU nicht verbunden !", ILI9486_RED, 3, 5000);
   }
 }
 
@@ -1789,7 +1857,7 @@ void sendBus33Data(uint16_t id, uint8_t byte0, uint8_t byte1, uint8_t byte2, uin
 
   //send request
   if (!can33.write(TxMsg)) {
-    Serial.println("Senden fehlgeschlagen");
+    //Serial.println("Senden fehlgeschlagen");
   }
 }
 
@@ -1819,16 +1887,11 @@ void clearFCs() {
     //recive with timeout
     CAN_message_t can_MsgRx;
     while ((int)millis() < requestTime + 1000);
-    Serial.println("answered = " + (String)answered);
+    //Serial.println("answered = " + (String)answered);
     if (fcs <= 0) { //wenn keine Fehlercodes, Info anzeigen
       if (actualView == FC_VIEW) {
         tft.println("Keine Fehlercodes");
       }
-      info thisActualInfo("Keine Fehlercodes", foreColor, 3, 5000);
-      actualInfo = thisActualInfo;
-    } else {
-      info thisActualInfo((String)fcs + " Fehlercodes", ILI9486_RED, 3, 5000);
-      actualInfo = thisActualInfo;
     }
     if (actualView == FC_VIEW && answered == false) {
       tft.println("Keine Rueckmeldung von ECU");
@@ -1857,11 +1920,6 @@ void requestFCs() {
     if (actualView == FC_VIEW) {
       tft.println("Keine Fehlercodes");
     }
-    info thisActualInfo("Keine Fehlercodes", foreColor, 3, 5000);
-    actualInfo = thisActualInfo;
-  } else {
-    info thisActualInfo((String)fcs + " Fehlercodes", ILI9486_RED, 3, 5000);
-    actualInfo = thisActualInfo;
   }
   if (actualView == FC_VIEW && answered == false) {
     tft.println("Keine Rueckmeldung von ECU");
