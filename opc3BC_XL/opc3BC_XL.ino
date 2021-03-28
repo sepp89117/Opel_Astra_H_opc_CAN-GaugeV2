@@ -138,6 +138,7 @@ float inj = 0.0f;
 bool isMilOn = false;
 float aat = 0.0f; //Außentemp. (CAN 33,3kbps)
 int distanceBehind = 0;
+float knockVal = 0.0f;
 byte knockRet1;
 byte knockRet2;
 byte knockRet3;
@@ -852,24 +853,26 @@ void drawGraphView() {
 }
 
 void drawIgnitionView() {
+  float lambda = afr / 14.7f;
+
   tft.fillRect(0, 0, 480, 320 - 43, backColor);
 
   tft.setTextColor(foreColor);
   tft.setFont(Arial_12);
   tft.setCursor(3, 12);
-  tft.print("BATT VOLT ");
+  tft.print("Lambda ");
   tft.setCursor(3 + 93, 10);
   tft.setFont(Arial_14);
-  tft.print(vBatt);
-  tft.print(" V");
+  tft.print(lambda, 2);
+  //tft.print(" V");
 
   tft.setFont(Arial_12);
   tft.setCursor(326, 12);
-  tft.print("OUT TEMP ");
+  tft.print("AFR ");
   tft.setCursor(326 + 86, 10);
   tft.setFont(Arial_14);
-  tft.print(aat, 1);
-  tft.print(" *C");
+  tft.print(afr, 1);
+  //tft.print(" *C");
 
   //drawBar(int x, int y, char *title, int vMin, int vMax, int vYellow, int vRed, float value)
   drawBar(10, 35, (char*)"IAA [*CA]", -4, 22, 16, 18, ign); //IAA = Ignition Advance Angle
@@ -1026,19 +1029,37 @@ void askInfo() {
 //-------------------------------------------------------------//
 float getConsum() {
   float injSize = 470.0f;  // [ccm/min] @ injPress
-  float injPress = 300.0f; // injSize @ [kPa]
-  float newSize;
+  float injPress = 300.0f; // [kPa]
+  float newSize = 470.0f; // [ccm/min] @ injPress
+  float injCal = 0.57; // injectors battery offset calibration value
 
+  //calculate injectors flow rate
   if (rpm > 1000) {
     newSize = injSize * sqrt((injPress + (float)boost) / injPress);
   } else {
     newSize = injSize * sqrt((injPress - 70.0f) / injPress); // -70kPa Saugrogrdruck im Leerlauf
   }
-  float consum = (inj - 0.57f) * (float)rpm * newSize * 0.12f / 60000.0f; // 0,57 = verzögerung beim Öffnen - verzögerung beim Schließen
+
+  //injectors battery offset calibration
+  if (vBatt > 14) {
+    //0.72 @ 14V, 0.63 @ 15V
+    injCal = map(vBatt, 14, 15, 0.72, 0.63);
+  } else if (vBatt > 13) {
+    //0.84 @ 13V, 0.72 @ 14V
+    injCal = map(vBatt, 13, 14, 0.84, 0.72);
+  } else if (vBatt >= 12) {
+    //0.97 @ 12V, 0.84 @ 13V
+    injCal = map(vBatt, 12, 13, 0.97, 0.84);
+  } else if (vBatt < 12) {
+    //1.13 @ 11V, 0.97 @ 12V
+    injCal = map(vBatt, 11, 12, 1.13, 0.97);
+  }
+
+  float consum = (inj - injCal) * (float)rpm * newSize * 0.12f / 60000.0f;
   if (consum < 0) consum = 0.0f;
 
   //calculate absolute consume
-  absolutConsume += consum / 3600000.0f * (millis() - lastConsumeTime); //[l/h] / ms = [l/ms] * delta[ms] = l/deltaTime
+  absolutConsume += consum / 3600000.0f * (float)(millis() - lastConsumeTime); //[l/h] / ms = [l/ms] * delta[ms] = l/deltaTime
   lastConsumeTime = millis();
 
   addValue(consumeArray, consum);
@@ -1048,7 +1069,7 @@ float getConsum() {
 
 float getAFR() {
   float afrC = 14.7f;
-  float rohBenzin = 0.759f; //@ 0°C
+  float rohBenzin = 0.759f; //[kg/l] @ 0°C
   rohBenzin = rohBenzin * (1.0f - (float)ambientTemp * 0.001f);// Wärmeausdehnung
   float kgBenzin = rohBenzin * consume;
 
@@ -1443,9 +1464,9 @@ void tech2() {
       }
     } else { //wenn verbunden
       if (listSet == false) { //wenn Datenliste noch nicht konfiguriert
-        sendEcuData(0x10, 0x0C, 0xAA, 0x04, 0x10, 0x11, 0x12, 0x16); //Pakete 10, 11, 12, 16
+        sendEcuData(0x10, 0x0C, 0xAA, 0x04, 0x10, 0x11, 0x12, 0x13); //Pakete 10, 11, 12, 13
         threads.delay(15); //Warte 15ms
-        sendEcuData(0x21, 0x14, 0x19, 0x15, 0x13, 0x18, 0x17, 0x00); //Pakete 14, 19, 3, 15, 13, 18, 17
+        sendEcuData(0x21, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x00); //Pakete 14, 15, 16, 17, 18, 19
         listSet = true;
 
         //Starte Herzschlag / Verbindungsüberwachung
@@ -1520,13 +1541,13 @@ void handleData500Msg(const CAN_message_t &can_MsgRx) {
         if (boost > rMAXboost)rMAXboost = boost;
         break;
 
-      case 0x16:
-        ign = (can_MsgRx.buf[2] - 36.0f) / 10.0f;
-
-        if (ign > rMAXign)rMAXign = ign;
+      case 0x13:
+        //Pedal Position
         break;
 
       case 0x14:
+        //Throttle Position
+
         inj = can_MsgRx.buf[7] / 10.0f; //Injektor Pulsweite
 
         if (rpm <= 5)inj = 0;
@@ -1534,6 +1555,24 @@ void handleData500Msg(const CAN_message_t &can_MsgRx) {
         if (injAuslast > rMAXinjAuslast)rMAXinjAuslast = injAuslast;
         if (inj > rMAXinj)rMAXinj = inj;
         getConsum();
+        break;
+
+      case 0x15:
+        tankInhalt = (can_MsgRx.buf[7] / 2.55f - can_MsgRx.buf[6] / 256.0f);
+        if (tankInhalt <= 5.0f) {
+          actualInfo = info((char*)"Kraftstoffstand niedrig!", ILI9486_RED, 3, 5000);
+        }
+        break;
+
+      case 0x16:
+        ign = (can_MsgRx.buf[2] - 36.0f) / 10.0f;
+
+        if (ign > rMAXign)rMAXign = ign;
+        break;
+
+      case 0x17:
+        //Klopfsesor-Spannung = (A*5 + B/51) / 10  [V]
+        knockVal = (can_MsgRx.buf[1] * 5.0f + can_MsgRx.buf[2] / 51.0f) / 10.0f;
         break;
 
       case 0x18:
@@ -1549,16 +1588,6 @@ void handleData500Msg(const CAN_message_t &can_MsgRx) {
         sft = (can_MsgRx.buf[1] - 128.0f) / 1.28;
         break;
 
-      case 0x15:
-        tankInhalt = (can_MsgRx.buf[7] / 2.55f - can_MsgRx.buf[6] / 256.0f);
-        if (tankInhalt <= 5.0f) {
-          actualInfo = info((char*)"Kraftstoffstand niedrig!", ILI9486_RED, 3, 5000);
-        }
-
-
-
-        break;
-
       case 0x81:
         answered = true;
         //Fehlercodes
@@ -1569,6 +1598,7 @@ void handleData500Msg(const CAN_message_t &can_MsgRx) {
           decodeFCs(can_MsgRx.buf, 0);
         }
         break;
+
       case 0xA9: //TODO test 0xA9
         answered = true;
         //Fehlercodes
