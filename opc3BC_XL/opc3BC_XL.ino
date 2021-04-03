@@ -1,7 +1,7 @@
 /*
    Autor: Sebastian Balzer
-   Version: 2.2 XL + PC-Out
-   Date: 27.03.2021
+   Version: 2.3 XL + PC-Out
+   Date: 03.04.2021
 
    Hardware: Teensy 4.0, Waveshare CAN Board SN65HVD230, Waveshare 4inch RPi LCD (C) ILI9486 with XPT2046 Touch, LM2596 DC/DC Converter - set 5.0 Volt out
    Car: Opel Astra H opc
@@ -131,6 +131,7 @@ float maf = 0.0f;
 float mafVolt = 0.0f;
 float ign = 0;
 int sft = 0;
+float lambdaVal = 0.0f;
 int fcs = 0;
 int rpm = 0;
 int speed = 0;
@@ -143,6 +144,7 @@ byte knockRet1;
 byte knockRet2;
 byte knockRet3;
 byte knockRet4;
+
 //berechnete Daten
 float absolutConsume;
 int injAuslast = 0;
@@ -159,6 +161,7 @@ unsigned long lastConsumeTime = 0;
 double strecke = 0;
 double odoMeter = 0;
 float tankInhalt = 0;
+
 //Alte Motordaten-Variablen
 float oldvBatt = 0.0f;
 int oldfcs = 0;
@@ -179,6 +182,7 @@ bool oldisMilOn = true;
 float oldconsume = 0.0f;
 float oldafr = 0.0f;
 float oldaat;
+
 //max-reached-vals
 int rMAXect = 0;
 int rMAXboost = 0;
@@ -853,7 +857,7 @@ void drawGraphView() {
 }
 
 void drawIgnitionView() {
-  float lambda = afr / 14.7f;
+  float lambda = getLambda(); // afr / 14.7f;
 
   tft.fillRect(0, 0, 480, 320 - 43, backColor);
 
@@ -866,13 +870,16 @@ void drawIgnitionView() {
   tft.print(lambda, 2);
   //tft.print(" V");
 
+
   tft.setFont(Arial_12);
   tft.setCursor(326, 12);
-  tft.print("AFR ");
+  tft.print("Noise ");
   tft.setCursor(326 + 86, 10);
+  if (knockVal > getEngineNoiseLimit()) tft.setTextColor(0xF800); //red value
   tft.setFont(Arial_14);
-  tft.print(afr, 1);
-  //tft.print(" *C");
+  tft.print(knockVal, 2);
+  tft.print(" V");
+  tft.setTextColor(foreColor);
 
   //drawBar(int x, int y, char *title, int vMin, int vMax, int vYellow, int vRed, float value)
   drawBar(10, 35, (char*)"IAA [*CA]", -4, 22, 16, 18, ign); //IAA = Ignition Advance Angle
@@ -1078,12 +1085,85 @@ float getAFR() {
   return afrC;
 }
 
+float getLambda() {
+  //lookup table from https://www.lotustalk.com/attachments/oxygen-sensor-conversion-table-png.1030577/
+  float lmbdaCalc = lambdaVal * 200.0f;
+
+  float lambda = 0;
+
+  if (lmbdaCalc >= 193) {
+    lambda = 0.70f;
+  } else if (lmbdaCalc >= 189) {
+    lambda = map(lmbdaCalc, 189, 193, 74, 70) / 100.0f;
+  } else if (lmbdaCalc >= 184) {
+    lambda = map(lmbdaCalc, 184, 189, 78, 74) / 100.0f;
+  } else if (lmbdaCalc >= 180) {
+    lambda = map(lmbdaCalc, 180, 184, 81, 78) / 100.0f;
+  } else if (lmbdaCalc >= 176) {
+    lambda = map(lmbdaCalc, 176, 180, 85, 81) / 100.0f;
+  } else if (lmbdaCalc >= 172) {
+    lambda = map(lmbdaCalc, 172, 176, 88, 85) / 100.0f;
+  } else if (lmbdaCalc >= 168) {
+    lambda = map(lmbdaCalc, 168, 172, 92, 88) / 100.0f;
+  } else if (lmbdaCalc >= 156) {
+    lambda = map(lmbdaCalc, 156, 168, 96, 92) / 100.0f;
+  } else if (lmbdaCalc >= 143) {
+    lambda = map(lmbdaCalc, 143, 156, 98, 96) / 100.0f;
+  } else if (lmbdaCalc >= 92) {
+    lambda = map(lmbdaCalc, 92, 143, 100, 98) / 100.0f;
+  } else if (lmbdaCalc >= 74) {
+    lambda = map(lmbdaCalc, 74, 92, 101, 100) / 100.0f;
+  } else if (lmbdaCalc >= 16) {
+    lambda = map(lmbdaCalc, 16, 74, 104, 101) / 100.0f;
+  } else if (lmbdaCalc >= 12) {
+    lambda = map(lmbdaCalc, 12, 16, 106, 104) / 100.0f;
+  } else if (lmbdaCalc >= 8) {
+    lambda = map(lmbdaCalc, 8, 12, 110, 106) / 100.0f;
+  } else if (lmbdaCalc >= 4) {
+    lambda = map(lmbdaCalc, 4, 8, 115, 110) / 100.0f;
+  } else if (lmbdaCalc >= 0) {
+    lambda = map(lmbdaCalc, 0, 4, 120, 115) / 100.0f;
+  }
+
+  return lambda;
+}
+
 float getEngineRunningMinutes() {
   float runningTime;
   if (EngineStartTime == 0) runningTime = 0.0f;
   else runningTime = (float)(millis() - EngineStartTime) / 60000.0f;
 
   return runningTime;
+}
+
+float getEngineNoiseLimit() {
+  float noiseLimit = 0;
+
+  if (rpm > 5710) {
+    noiseLimit = 2.61;
+  } else if (rpm > 5328) {
+    noiseLimit = map(rpm, 5328, 5710, 2.51, 2.61);
+  } else if (rpm > 4947) {
+    noiseLimit = map(rpm, 4947, 5328, 2.41, 2.51);
+  } else if (rpm > 4566) {
+    noiseLimit = map(rpm, 4566, 4947, 2.22, 2.41);
+  } else if (rpm > 4183) {
+    noiseLimit = map(rpm, 4183, 4566, 2.00, 2.22);
+  } else if (rpm > 3802) {
+    noiseLimit = map(rpm, 3802, 4183, 1.82, 2.00);
+  } else if (rpm > 3421) {
+    noiseLimit = map(rpm, 3421, 3802, 1.61, 1.82);
+  } else if (rpm > 3039) {
+    noiseLimit = map(rpm, 3039, 3421, 1.45, 1.61);
+  } else if (rpm > 2657) {
+    noiseLimit = map(rpm, 2657, 3039, 1.35, 1.45);
+  } else if (rpm > 1894) {
+    noiseLimit = map(rpm, 1894, 2657, 1.39, 1.35);
+  } else if (rpm > 750) {
+    noiseLimit = map(rpm, 750, 1894, 1.37, 1.39);
+  }
+
+  return noiseLimit;
 }
 
 void speedHandle() {
@@ -1586,6 +1666,7 @@ void handleData500Msg(const CAN_message_t &can_MsgRx) {
       case 0x19:
         //Lambdasonde
         sft = (can_MsgRx.buf[1] - 128.0f) / 1.28;
+        lambdaVal = can_MsgRx.buf[3] / 51.0f;
         break;
 
       case 0x81:
@@ -1958,30 +2039,174 @@ void requestFCs() {
 
 void decodeFCs(const byte buff[], const int stat) {
   if (actualView == FC_VIEW) {
-
     tft.print(intToChar(fcs)); //Fehlernummer (1. , 2. , 3.)
-    tft.print(". "); //Fehlernummer (1. , 2. , 3.)
+    tft.print(". ");           //Fehlernummer (1. , 2. , 3.)
 
-    byte first = (byte)buff[1];
-    byte seconda = (byte)buff[2];
+    byte firstByte = (byte)buff[1];
+    byte secondByte = (byte)buff[2];
 
-    switch (first >> 6) {
-      case 0: tft.print('P'); break;
-      case 1: tft.print('C'); break;
-      case 2: tft.print('B'); break;
-      case 3: tft.print('U'); break;
-      default: tft.print('-'); break;
-    }
+    byte fSystem = firstByte >> 6;           //P, C, B, U
+    byte specific = (firstByte >> 4) & 0x03; // 0 or 1
+    byte subSystem = firstByte & 0x0f;       // 0 to 7
+    byte thirdNum = secondByte >> 4;
+    byte fourthNum = secondByte & 0x0f;
 
-    tft.print((first >> 4) & 0x03, DEC);
-    tft.print(first & 0x0f, HEX);
-    tft.print(seconda >> 4, HEX);
-    tft.print(seconda & 0x0f, HEX);
+    char desc[3];
+    sprintf(desc, "%02x", (byte)buff[3]); //descriptor
 
-    if (stat == 0) {
-      tft.print(" - INAKTIV");
-    } else if (stat == 1) {
-      tft.print(" - AKTIV");
+    switch (fSystem) {
+      case 0:
+        tft.print('P');
+        break;
+      case 1:
+        tft.print('C');
+        break;
+      case 2:
+        tft.print('B');
+        break;
+      case 3:
+        tft.print('U');
+        break;
+      default:
+        tft.print('-');
+        break;
+    } //P
+
+    tft.print(specific, DEC);  //0
+    tft.print(subSystem, HEX); //4
+    tft.print(thirdNum, HEX);  //0
+    tft.print(fourthNum, HEX); //0
+    tft.print("-");            //-
+    tft.print(desc);           //5
+
+    if (fSystem == 0) { //Power train
+      switch (subSystem) {
+        case 0:
+          tft.print(" Sensor Umgebungslufttemperatur");
+          break;
+        case 1: //LMM, IAT, ECT, TPS, O2S
+          switch (thirdNum) {
+            case 0:
+              tft.print(" Luftmassenmesser");
+              break;
+            case 1:
+              if (fourthNum == 0) {
+                tft.print(" Sensor Ansauglufttemperatur");
+              }
+              else if (fourthNum == 5) {
+                tft.print(" Sensor Kuehlmitteltemperatur");
+              }
+              break;
+            case 2:
+              tft.print(" Pedalpositionsgeber A");
+              break;
+            case 3:
+              tft.print(" Lambdasonde");
+              break;
+            case 4:
+              tft.print(" Lambdasonde Heizkreis");
+              break;
+            case 7:
+              tft.print(" Kraftstoffkorrektur");
+              break;
+          }
+          break;
+
+        case 2: //INJ, RPM, APP, FP, BPS, BPV,
+          switch (thirdNum) {
+            case 0:
+              tft.print(" Einspritzventil ");
+              tft.print(fourthNum, DEC);
+              break;
+            case 1:
+              tft.print(" Motordrehzahl zu groß");
+              break;
+            case 2:
+              tft.print(" Pedalpositionsgeber B");
+              break;
+            case 3:
+              if (fourthNum == 0) {
+                tft.print(" Kraftstoffpumpe Primaerkreis");
+              }
+              else if (fourthNum == 5) {
+                tft.print(" Ladedruckgeber");
+              }
+              break;
+            case 4:
+              tft.print(" Ladedruckregelventil");
+              break;
+          }
+        case 3:
+          if (thirdNum == 0 && fourthNum == 0) { //P0300
+            tft.print(" Fehlzuendung mehrere Zylinder");
+          } else {
+            switch (thirdNum) {
+              case 0:
+                tft.print(" Fehlzuendung Zylinder ");
+                tft.print(fourthNum, DEC);
+                break;
+              case 1:
+                tft.print(" Fehlzuendung bei leerem Tank");
+                break;
+              case 2:
+                tft.print(" Klopfsensor");
+                break;
+              case 3:
+                tft.print(" Kurbelwellensensor");
+                break;
+              case 4:
+                tft.print(" Nockenwellensensor");
+                break;
+            }
+          }
+          break;
+
+        case 4:
+          if (thirdNum == 4)
+            tft.print(" Tankentlueftungssystem");
+          else if (thirdNum == 6)
+            tft.print(" Kraftstoffstandsensor");
+          break;
+
+        case 5:
+          switch (thirdNum) {
+            case 0:
+              tft.print(" Fahrzeuggeschwindigkeitssignal");
+              break;
+            case 2:
+              tft.print(" Oeldruckschalter");
+              break;
+            case 3:
+              tft.print(" Klimaanlagendruck");
+              break;
+            case 7:
+              tft.print(" Bremslichtschalter");
+              break;
+          }
+          break;
+
+        case 6:
+          switch (thirdNum) {
+            case 0:
+              tft.print(" Klopfsensor Schaltkreis");
+              break;
+            case 2:
+              tft.print(" Generator Regelung");
+              break;
+            case 5:
+              tft.print(" MIL Fehler");
+              break;
+          }
+          break;
+
+        case 7:
+          tft.print(" Kupplungsschalter");
+          break;
+
+        default:
+          tft.print(" UNKNWN");
+          break;
+      }
     }
     tft.println();
   }
