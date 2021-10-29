@@ -6,6 +6,7 @@ Needs Waveshare 4inch RPi LCD (C) ILI9486 display and lib
 <br>
 Watch demo on https://youtu.be/G2oHpHkk6c8
 <br>
+You may need to comment out ``#include "utils/debug.h"`` in TeensyThreads.h (line 29)
 <br>
 <h2>Hardware:</h2><br>
  - Teensy 4.0<br>
