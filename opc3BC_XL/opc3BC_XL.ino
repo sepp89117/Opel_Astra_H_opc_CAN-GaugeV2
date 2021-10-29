@@ -1427,7 +1427,7 @@ void gtrMeter(float value, int vmin, int vmax, int x, int y, char *units, int vC
   float startAngle = (vC <= 0 ? 3 : vC) - 180;
   float endAngle   = -3;
 
-  if(title == "FUEL TANK"){
+  if(title == (char*)"FUEL TANK"){
     startAngle = -177;
     endAngle   = vC - 180;
   }
