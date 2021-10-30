@@ -1,7 +1,7 @@
 /*
    Autor: Sebastian Balzer
-   Version: 2.5 XL + PC-Out
-   Date: 29.10.2021
+   Version: 2.6 XL + PC-Out
+   Date: 30.10.2021
 
    Hardware: Teensy 4.0, Waveshare CAN Board SN65HVD230, Waveshare 4inch RPi LCD (C) ILI9486 with XPT2046 Touch, LM2596 DC/DC Converter - set 5.0 Volt out
    Car: Opel Astra H opc
@@ -10,12 +10,16 @@
 */
 
 //Language select - only uncomment one
-//#define DE
-#define EN
-//#define FR
+//#define DE //Deutsch
+#define EN //English
+//#define FR //France
+//#define RO //Romanian
 
 //Sends data over serial to PC
 //#define PCOUT
+
+//Take Screenshot to Serial Monitor with command "<sh>"
+//#define SHTS
 
 #include "SPI.h"
 #include <XPT2046_Touchscreen.h>
@@ -111,7 +115,6 @@ byte knockRet1;
 byte knockRet2;
 byte knockRet3;
 byte knockRet4;
-bool parkLightsOn = false;
 
 //berechnete Daten
 float absolutConsume;
@@ -127,8 +130,8 @@ long lastRGang = 0;
 uint64_t EngineStartTime = 0;
 uint64_t lastSpeedTime = 0;
 uint64_t lastConsumeTime = 0;
-double strecke = 0;
-double odoMeter = 0;
+float strecke = 0;
+float odoMeter = 0;
 float tankInhalt = 0;
 
 //Alte Motordaten-Variablen
@@ -211,6 +214,7 @@ uint16_t maxLcdBright = 255;
 uint16_t minLcdBright = 50;
 bool skipBoot = false;
 bool playAlarms = true;
+bool handleRVolume = true;
 
 //Buttons
 const uint8_t maxVisibleBtns = 10;
@@ -231,7 +235,6 @@ Button btnHold = Button(90, 285, 84, 34, (char*)"Hold", backColor, styleBtn);
 Button btnIgnition = Button(180, 285, 84, 34, (char*)"Ign", backColor, styleBtn);
 Button btnSave = Button(90, 285, 84, 34, (char*)"Save", backColor, styleBtn);
 //--- Header buttons (x-area is from 130 to 350 px)
-Button btnLcdBright = Button(160, 0, 30, 30, (char*)"", backColor, brightnessBtn);
 Button btnSettings = Button(290, 0, 30, 30, (char*)"", backColor, settingsBtn);
 //--- Settings Buttons
 //- skip boot logo
@@ -244,6 +247,8 @@ Button setBtnPlus2 = Button(395, 145, 30, 30, (char*)"+", backColor, styleBtnSma
 Button setBtnMinus2 = Button(440, 145, 30, 30, (char*)"-", backColor, styleBtnSmall);
 //- play alarms
 Button setBtnSwitch2 = Button(395, 235, 30, 30, (char*)"S", backColor, styleBtnSmall);
+//- vol adj in R
+Button setBtnSwitch3 = Button(395, 190, 30, 30, (char*)"S", backColor, styleBtnSmall);
 
 void setup() {
   analogWrite(3, 0); //Disp. LED off
@@ -298,13 +303,14 @@ void setup() {
   playAlarms = EEPROM.read(6);
   maxLcdBright = EEPROM.read(7);
   minLcdBright = EEPROM.read(8);
+  handleRVolume = EEPROM.read(9);
 
   if (maxLcdBright < 1) maxLcdBright = 255;
 
   analogWrite(3, maxLcdBright); //Disp. LED on
   if (!skipBoot) bootAnimation(); //show bootlogo
 
-  //initialisiere EEPROM auf 1. Start
+  //initialize EEPROM to 1st start - for a reminder to check fluid levels every 100 engine starts
   //  byte bytes[2];
   //  bytes[0] = (engineStarts + 1) & 0xFF;
   //  bytes[1] = ((engineStarts + 1) >> 8) & 0xFF;
@@ -319,12 +325,12 @@ void setup() {
   spiThreadID = threads.addThread(spiThread);
   displayDataThreadID = threads.addThread(displayData);
 
-  //starte Kommunikation mit ECU
+  //start communication with ECU
   tech2ThreadID = threads.addThread(tech2);
 
   engineStarts = EEPROM.read(3) * 256 + EEPROM.read(4);
 
-  if (engineStarts % 100 == 0) { //ca. alle 2000 km (100 * ca. 20 km) Meldung geben
+  if (engineStarts % 100 == 0) { //check fluid levels every 100 engine starts
     actualInfo = info(strCheckFl, ILI9486_RED, 5, 10000, fluids);
   }
 }
@@ -332,11 +338,17 @@ void setup() {
 void loop(void) {
   can500.events();
   can33.events();
+
+#ifdef SHTS //Screenshot to Serial Monitor
+  receiveFromSerial();
+#endif
 }
 
 void spiThread() {
   while (1) {
-    if (dispBufReady) tft.updateScreen();
+    if (dispBufReady) {
+      tft.updateScreen();
+    }
 
     checkTouch();
 
@@ -356,7 +368,7 @@ void checkTouch() {
     tft.setFont(Arial_20);
     int pxLen = tft.strPixelLen("Saved!");
 
-    if (actualInfo.isTouched(p.x, p.y)) addDisInfo((char*)actualInfo.Text);
+    if (actualInfo.isTouched(p.x, p.y)) addDisInfo(actualInfo.Text);
 
     if (btnDTCs.isTouched(p.x, p.y)) {
       switchView(FC_VIEW);
@@ -419,16 +431,18 @@ void checkTouch() {
       threads.delay(250); //avoids bouncing
     } else if (btnSave.isTouched(p.x, p.y)) {
       //save Settings
-      byte bytes[4];
+      byte bytes[5];
       bytes[0] = skipBoot;
       bytes[1] = playAlarms;
       bytes[2] = maxLcdBright;
-      bytes[3] = minLcdBright; //thirdLcdBright;
+      bytes[3] = minLcdBright;
+      bytes[4] = handleRVolume;
 
       EEPROM.write(5, bytes[0]);
       EEPROM.write(6, bytes[1]);
       EEPROM.write(7, bytes[2]);
       EEPROM.write(8, bytes[3]);
+      EEPROM.write(9, bytes[4]); //handleRVolume
 
       //show info "saved"
       tft.fillRoundRect(230 - (pxLen / 2), 0, pxLen + 20, 40, 5, 0xCFF9);
@@ -443,6 +457,10 @@ void checkTouch() {
       tft.fillRoundRect(230 - (pxLen / 2), 0, pxLen + 20, 40, 5, backColor); //discard info "saved"
     } else if (setBtnSwitch2.isTouched(p.x, p.y)) {
       playAlarms = !playAlarms;
+      threads.delay(250); //avoids bouncing
+      tft.fillRoundRect(230 - (pxLen / 2), 0, pxLen + 20, 40, 5, backColor); //discard info "saved"
+    } else if (setBtnSwitch3.isTouched(p.x, p.y)) {
+      handleRVolume = !handleRVolume;
       threads.delay(250); //avoids bouncing
       tft.fillRoundRect(230 - (pxLen / 2), 0, pxLen + 20, 40, 5, backColor); //discard info "saved"
     } else if (setBtnPlus1.isTouched(p.x, p.y)) {
@@ -482,15 +500,16 @@ void displayData() {
     afr = getAFR();
 
     //r-gang-abfrage
-    if ((millis() - lastRGang >= 3000 && rGang) || (rOut && rGang)) { //R-Gang länger als 1 Sec aus
-      //Musik wieder etwas lauter machen
-      for (int i = 0; i < 6; i++) {
-        sendBus33Data(0x175, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01);
-        if (i < 5) threads.delay(100);
+    if (handleRVolume)
+      if ((millis() - lastRGang >= 3000 && rGang) || (rOut && rGang)) { //R-Gang länger als 3 Sec aus
+        //Musik wieder etwas lauter machen
+        for (int i = 0; i < 6; i++) {
+          sendBus33Data(0x175, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01);
+          if (i < 5) threads.delay(100);
+        }
+        rGang = false;
+        rOut = false;
       }
-      rGang = false;
-      rOut = false;
-    }
 
     dispBufReady = false;
     if (actualView == HOME_VIEW) {
@@ -573,7 +592,7 @@ void switchView(int view) {
   } else if (actualView == MAX_VIEW) {
     tft.writeRect(420, 2, 60, 23, (uint16_t*)opc23px);
     tft.setCursor(0, 0); tft.setFont(Arial_20); tft.setTextColor(foreColor);
-    tft.print(strMaxVals);
+    tft.print(F(strMaxVals));
 
     clearBtns();
 
@@ -585,7 +604,7 @@ void switchView(int view) {
   } else if (actualView == ACC_VIEW) {
     tft.writeRect(420, 2, 60, 23, (uint16_t*)opc23px);
     tft.setCursor(0, 0); tft.setFont(Arial_20); tft.setTextColor(foreColor);
-    tft.print(strAccMon);
+    tft.print(F(strAccMon));
 
     clearBtns();
 
@@ -599,7 +618,7 @@ void switchView(int view) {
   } else if (actualView == FUEL_VIEW) {
     tft.writeRect(420, 2, 60, 23, (uint16_t*)opc23px);
     tft.setCursor(0, 0); tft.setFont(Arial_20); tft.setTextColor(foreColor);
-    tft.print(strFuelMon);
+    tft.print(F(strFuelMon));
 
     clearBtns();
 
@@ -610,7 +629,7 @@ void switchView(int view) {
   } else if (actualView == SETT_VIEW) {
     tft.writeRect(420, 2, 60, 23, (uint16_t*)opc23px);
     tft.setCursor(0, 0); tft.setFont(Arial_20); tft.setTextColor(foreColor);
-    tft.print(strSettings);
+    tft.print(F(strSettings));
 
     clearBtns();
 
@@ -622,6 +641,7 @@ void switchView(int view) {
     addButton(&setBtnPlus2);
     addButton(&setBtnMinus2);
     addButton(&setBtnSwitch2);
+    addButton(&setBtnSwitch3);
 
     drawSettingsView();
   }
@@ -695,7 +715,7 @@ void drawMaxView() {
 
   int y = 36;
   tft.setCursor(2, y);
-  tft.print(strCoolant);
+  tft.print(F(strCoolant));
   tft.setCursor(215, y);
   tft.print(rMAXect);
   tft.setCursor(270, y);
@@ -703,7 +723,7 @@ void drawMaxView() {
 
   y += 21;
   tft.setCursor(2, y);
-  tft.print(strBoost);
+  tft.print(F(strBoost));
   tft.setCursor(215, y);
   tft.print(rMAXboost);
   tft.setCursor(270, y);
@@ -906,7 +926,7 @@ void drawAccView() {
   tft.setFont(Arial_14);
   tft.setTextColor(foreColor);
   tft.setCursor(170, 195);
-  tft.print(strOdoDev);
+  tft.print(F(strOdoDev));
   tft.setFont(Arial_20);
   tft.fillRect(170, 216, 80, 40, backColor);
   tft.setCursor(170, 216);
@@ -928,7 +948,7 @@ void drawFuelView() {
   tft.setFont(Arial_14);
   tft.setTextColor(foreColor);
   tft.setCursor(0, y);
-  tft.print(strAvCons);
+  tft.print(F(strAvCons));
   tft.setCursor(270, y);
   if (absolutConsume > 0 && strecke > 0)
     tft.print(absolutConsume / strecke * 100.0f, 1);
@@ -938,7 +958,7 @@ void drawFuelView() {
 
   y += 25;
   tft.setCursor(0, y);
-  tft.print(strAbsCons);
+  tft.print(F(strAbsCons));
   tft.setCursor(270, y);
   tft.print(absolutConsume, 1);
   tft.print(" L/Trip");
@@ -947,7 +967,7 @@ void drawFuelView() {
 
   y += 25;
   tft.setCursor(0, y);
-  tft.print(strAvSpeed);
+  tft.print(F(strAvSpeed));
   tft.setCursor(270, y);
   if (strecke > 0 && runningTime > 0) tft.print((float)strecke / (runningTime / 60.0f), 2);
   else tft.print("0.00");
@@ -955,14 +975,14 @@ void drawFuelView() {
 
   y += 25;
   tft.setCursor(0, y);
-  tft.print(strDrivDist);
+  tft.print(F(strDrivDist));
   tft.setCursor(270, y);
   tft.print(strecke, 2);
   tft.print(" km");
 
   y += 25;
   tft.setCursor(0, y);
-  tft.print(strDrivTime);
+  tft.print(F(strDrivTime));
   tft.setCursor(270, y);
   tft.print(runningTime, 0);
   tft.print(" min");
@@ -974,7 +994,7 @@ void drawSettingsView() {
   //skip boot logo default = false
   tft.setFont(Arial_14); tft.setTextColor(foreColor);
   tft.setCursor(5, 60);
-  tft.print(strSkipLogo);
+  tft.print(F(strSkipLogo));
   tft.print("  ");
   tft.setTextColor(0xFF4A);
   if (skipBoot) tft.print("true");
@@ -983,7 +1003,7 @@ void drawSettingsView() {
   //startup LCD brigthness default = 255 = 100%
   tft.setFont(Arial_14); tft.setTextColor(foreColor);
   tft.setCursor(5, 105);
-  tft.print(strMaxLcdBr);
+  tft.print(F(strMaxLcdBr));
   tft.print("  ");
   tft.setTextColor(0xFF4A);
   tft.print(maxLcdBright / 2.55f, 0);
@@ -992,16 +1012,25 @@ void drawSettingsView() {
   //second LCD brigthness default = 100 = 39%
   tft.setFont(Arial_14); tft.setTextColor(foreColor);
   tft.setCursor(5, 150);
-  tft.print(strMinLcdBr);
+  tft.print(F(strMinLcdBr));
   tft.print("  ");
   tft.setTextColor(0xFF4A);
   tft.print(minLcdBright / 2.55f, 0);
   tft.print(" %");
 
+  //reduce volume in R-gear (default = true)
+  tft.setFont(Arial_14); tft.setTextColor(foreColor);
+  tft.setCursor(5, 195);
+  tft.print(F(strhandleRVolume));
+  tft.print("  ");
+  tft.setTextColor(0xFF4A);
+  if (handleRVolume) tft.print("true");
+  else tft.print("false");
+
   //play critical alarms (default = true)
   tft.setFont(Arial_14); tft.setTextColor(foreColor);
   tft.setCursor(5, 240);
-  tft.print(strPlayAlarms);
+  tft.print(F(strPlayAlarms));
   tft.print("  ");
   tft.setTextColor(0xFF4A);
   if (playAlarms) tft.print("true");
@@ -1013,7 +1042,7 @@ void drawSettingsView() {
 //-------------------------------------------------------------//
 void drawInfo() {
   for (uint8_t i = 0; i < 10; i++) {
-    if (disabledInfos[i] == actualInfo.Text) {
+    if (strcmp(disabledInfos[i], actualInfo.Text) == 0) {
       return;
     }
   }
@@ -1064,17 +1093,14 @@ void drawInfo() {
 //------------------------Calculations-------------------------//
 //-------------------------------------------------------------//
 float getConsum() {
-  float injSize = 470.0f;  // [ccm/min] @ injPress
-  float injPress = 300.0f; // [kPa]
-  float newSize = 470.0f; // [ccm/min] @ injPress
+  float injSize = 470.0f;  // [ccm/min] @ referencePressure
+  float referencePressure = 300.0f; // [kPa]
+  float newSize = 470.0f; // [ccm/min] @ realPressure
+  float realPressure = 320.0f; // [kPa]
   float injCal = 0.57; // injectors battery offset calibration value
 
   //calculate injectors flow rate
-  if (rpm > 1000) {
-    newSize = injSize * sqrt((injPress + (float)boost) / injPress);
-  } else {
-    newSize = injSize * sqrt((injPress - 70.0f) / injPress); // -70kPa Saugrogrdruck im Leerlauf
-  }
+  newSize = injSize * sqrt(realPressure / referencePressure);
 
   //injectors battery offset calibration
   if (vBatt > 14) {
@@ -1202,9 +1228,9 @@ void speedHandle() {
   }
 
   if (EngineStartTime > 0) { //Motor Läuft, Strecke berechnen
-    double span = millis() - lastSpeedTime; //Zeit zwischen zwei Geschwindigkeitsangaben
-    odoMeter += (double)actSpeed / 3600000.0d * span;
-    strecke += (double)actSpeed / 3600000.0d * span;
+    float span = millis() - lastSpeedTime; //Zeit zwischen zwei Geschwindigkeitsangaben
+    odoMeter += (float)actSpeed / 3600000.0f * span;
+    strecke += (float)actSpeed / 3600000.0f * span;
     lastSpeedTime = millis();
   }
 
@@ -1427,11 +1453,11 @@ void gtrMeter(float value, int vmin, int vmax, int x, int y, char *units, int vC
   float startAngle = (vC <= 0 ? 3 : vC) - 180;
   float endAngle   = -3;
 
-  if(title == (char*)"FUEL TANK"){
+  if (title == (char*)"FUEL TANK") {
     startAngle = -177;
     endAngle   = vC - 180;
   }
-  
+
   if (startAngle > endAngle) startAngle -= 360;
   float steps = 0.2;
   int x2, y2;
@@ -1482,7 +1508,7 @@ void gtrMeter(float value, int vmin, int vmax, int x, int y, char *units, int vC
   byte len = 2; if (value > 9) len = 3; if (value > 99) len = 4; if (value > 999) len = 5;
   dtostrf(value, len, decis, buf);
 
-  if (v >= vC && vCritical >= 0) {
+  if (v >= vC && vCritical >= 0 && title != (char*)"FUEL TANK") {
     tft.setTextColor(ILI9486_RED);
   }
   else tft.setTextColor(foreColor);
@@ -1517,7 +1543,8 @@ void gtrMeter(float value, int vmin, int vmax, int x, int y, char *units, int vC
 void drawBar(int x, int y, char *title, int vMin, int vMax, int vYellow, int vRed, float value) {
   float graphHeight = 240.0f;
   float graphWidth = 65.0f;
-  float deltaMinMax = abs(vMax - vMin);
+  float signedDelta = vMax - vMin;
+  float deltaMinMax =  (signedDelta > 0) ? signedDelta : -signedDelta;
   float stepWidth = (graphHeight - 26.0f) / deltaMinMax;
   float divisors = 6.0f;
 
@@ -1647,6 +1674,64 @@ void playAlarm() {
   }
 }
 
+void screenshotToConsole() {
+  uint16_t buf[480];
+  uint16_t w = tft.width();
+  uint16_t h = tft.height();
+
+  Serial.println();
+  Serial.print(F("// Image Size     : "));
+  Serial.print(w);
+  Serial.print(F(" x "));
+  Serial.print(h);
+  Serial.println(F(" pixels"));
+  Serial.print(F("const unsigned short screenShot["));
+  Serial.print(w * h);
+  Serial.println(F("]={"));
+
+  //line by line
+  for (uint16_t iy = 0; iy < h; iy++) {
+    tft.readRect(0, iy, w, 1, buf);
+
+    for (uint16_t ix = 0; ix < w; ix++) {
+      Serial.print(F("0x"));
+      Serial.print(buf[ix], HEX);
+      if (ix < w - 1) Serial.print(F(", "));
+    }
+
+    if (iy < h - 1) Serial.print(F(","));
+    Serial.println();
+    delay(2);
+  }
+
+  Serial.println(F("}"));
+}
+
+byte ReadSerialMonitorString(char* sString) {
+  byte nCount = 0;
+
+  if (Serial.available() > 0) {
+    Serial.setTimeout(50);
+    nCount = Serial.readBytes(sString, 5);
+  }
+  sString[nCount] = 0; //String terminator
+
+  return nCount;
+}
+
+char sString[5]; //command from Serial
+void receiveFromSerial() {
+  // Check for command from Serial
+  if (ReadSerialMonitorString(sString) > 0) {
+    if (strstr_P(sString, PSTR("<sh>")) != NULL) { //strstr_P keeps sString in flash; PSTR avoid ram using
+      screenshotToConsole();
+    } else {
+      //undefined
+      Serial.print("unknown command: ");
+      Serial.println(sString);
+    }
+  }
+}
 //-------------------------------------------------------------//
 //------------------------OBD-Functions------------------------//
 //-------------------------------------------------------------//
@@ -1738,7 +1823,7 @@ void handleData500Msg(const CAN_message_t &can_MsgRx) {
         boost = can_MsgRx.buf[7] - firstBoostVal;
         power = maf * 0.383f;
         moment = ((float)power / 1.36f * 1000.0f) / (2.0f * 3.1415926f * rpm / 60.0f);
-        
+
         addValue(mafArray, maf);
         addValue(boostArray, boost);
         if (power > rMAXpower)rMAXpower = power;
@@ -1797,10 +1882,10 @@ void handleData500Msg(const CAN_message_t &can_MsgRx) {
         break;
 
       case 0x81:
-        answered = true;
         //Fehlercodes
         if (can_MsgRx.buf[4] == 0xFF) {
           //Ende der Übertragung
+          answered = true;
         } else {
           fcs++; //Fehleranzahl zählen
           decodeFCs(can_MsgRx.buf, 0);
@@ -1877,15 +1962,14 @@ void handleData33Msg(const CAN_message_t &can_MsgRx) {
     }
   } else if (can_MsgRx.id == 0x235) {
     //light signals
-    if (can_MsgRx.buf[1] >= 0x3A) {
-      parkLightsOn = true;
-      lcdBright = minLcdBright;
-      analogWrite(3, lcdBright); //LCD LED
-    } else {
-      parkLightsOn = false;
+    if (can_MsgRx.buf[1] != 0x3A) {
+      //Parking light off
       lcdBright = maxLcdBright;
-      analogWrite(3, lcdBright); //LCD LED
+    } else {
+      //Parking light on
+      lcdBright = minLcdBright;
     }
+    analogWrite(3, lcdBright); //LCD LED
 
   } else if (can_MsgRx.id == 0x340) { // UEC - Scheinwerfer
     //Sort by priority in ascending order
@@ -1926,7 +2010,7 @@ void handleData33Msg(const CAN_message_t &can_MsgRx) {
   } else if (can_MsgRx.id == 0x430) { //Info-Signale
     if (can_MsgRx.buf[0] == 0x62) { //R-Gang drin
       //Radio leiser machen
-      if (!rGang) {
+      if (!rGang && handleRVolume) {
         for (int i = 0; i < 10; i++) {
           sendBus33Data(0x175, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x1F);
           if (i < 9) threads.delay(100);
@@ -2064,7 +2148,7 @@ void requestFCs() {
   threads.kill(tech2ThreadID);
   threads.kill(testerPresentThreadID);
 
-  threads.delay(25);
+  threads.delay(50);
 
   // Disconnect Datamonitor
   sendEcuData(0x02, 0xAA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
@@ -2078,7 +2162,9 @@ void requestFCs() {
   answered = false;
 
   //recive with timeout
-  while (millis() - requestTime < 1500 && !answered);
+  while (millis() - requestTime < 3000 && !answered) {
+    can500.events();
+  }
 
   if (actualView == FC_VIEW && !answered) {
     tft.println(strNoResp);
@@ -2132,32 +2218,32 @@ void decodeFCs(const byte buff[], const int stat) {
     if (fSystem == 0) { //P (Power train)
       switch (subSystem) {
         case 0:
-          tft.print(strP00xx);
+          tft.print(F(strP00xx));
           break;
         case 1: //LMM, IAT, ECT, TPS, O2S
           switch (thirdNum) {
             case 0:
-              tft.print(strP010x);
+              tft.print(F(strP010x));
               break;
             case 1:
               if (fourthNum == 0) {
-                tft.print(strP0110);
+                tft.print(F(strP0110));
               }
               else if (fourthNum == 5) {
-                tft.print(strP0115);
+                tft.print(F(strP0115));
               }
               break;
             case 2:
-              tft.print(strP012x);
+              tft.print(F(strP012x));
               break;
             case 3:
-              tft.print(strP013x);
+              tft.print(F(strP013x));
               break;
             case 4:
-              tft.print(strP014x);
+              tft.print(F(strP014x));
               break;
             case 7:
-              tft.print(strP017x);
+              tft.print(F(strP017x));
               break;
           }
           break;
@@ -2165,49 +2251,49 @@ void decodeFCs(const byte buff[], const int stat) {
         case 2: //INJ, RPM, APP, FP, BPS, BPV,
           switch (thirdNum) {
             case 0:
-              tft.print(strP020x);
+              tft.print(F(strP020x));
               tft.print(" ");
               tft.print(fourthNum, DEC);
               break;
             case 1:
-              tft.print(strP021x);
+              tft.print(F(strP021x));
               break;
             case 2:
-              tft.print(strP022x);
+              tft.print(F(strP022x));
               break;
             case 3:
               if (fourthNum == 0) {
-                tft.print(strP0230);
+                tft.print(F(strP0230));
               }
               else if (fourthNum == 5) {
-                tft.print(strP0235);
+                tft.print(F(strP0235));
               }
               break;
             case 4:
-              tft.print(strP024x);
+              tft.print(F(strP024x));
               break;
           }
         case 3:
           if (thirdNum == 0 && fourthNum == 0) { //P0300
-            tft.print(strP0300);
+            tft.print(F(strP0300));
           } else {
             switch (thirdNum) {
               case 0:
-                tft.print(strP030x);
+                tft.print(F(strP030x));
                 tft.print(" ");
                 tft.print(fourthNum, DEC);
                 break;
               case 1:
-                tft.print(strP031x);
+                tft.print(F(strP031x));
                 break;
               case 2:
-                tft.print(strP032x);
+                tft.print(F(strP032x));
                 break;
               case 3:
-                tft.print(strP033x);
+                tft.print(F(strP033x));
                 break;
               case 4:
-                tft.print(strP034x);
+                tft.print(F(strP034x));
                 break;
             }
           }
@@ -2215,24 +2301,24 @@ void decodeFCs(const byte buff[], const int stat) {
 
         case 4:
           if (thirdNum == 4)
-            tft.print(strP044x);
+            tft.print(F(strP044x));
           else if (thirdNum == 6)
-            tft.print(strP046x);
+            tft.print(F(strP046x));
           break;
 
         case 5:
           switch (thirdNum) {
             case 0:
-              tft.print(strP050x);
+              tft.print(F(strP050x));
               break;
             case 2:
-              tft.print(strP052x);
+              tft.print(F(strP052x));
               break;
             case 3:
-              tft.print(strP053x);
+              tft.print(F(strP053x));
               break;
             case 7:
-              tft.print(strP057x);
+              tft.print(F(strP057x));
               break;
           }
           break;
@@ -2240,23 +2326,23 @@ void decodeFCs(const byte buff[], const int stat) {
         case 6:
           switch (thirdNum) {
             case 0:
-              tft.print(strP060x);
+              tft.print(F(strP060x));
               break;
             case 2:
-              tft.print(strP062x);
+              tft.print(F(strP062x));
               break;
             case 5:
-              tft.print(strP065x);
+              tft.print(F(strP065x));
               break;
           }
           break;
 
         case 7:
-          tft.print(strP07xx);
+          tft.print(F(strP07xx));
           break;
 
         default:
-          tft.print(" UNKNOWN");
+          tft.print(F(" UNKNOWN"));
           break;
       }
     }
