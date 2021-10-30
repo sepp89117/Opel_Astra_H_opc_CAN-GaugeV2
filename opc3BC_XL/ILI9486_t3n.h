@@ -1,5 +1,5 @@
-// https://github.com/kurte/ILI9486_t3n
-// http://forum.pjrc.com/threads/26305-Highly-optimized-ILI9486-(320x240-TFT-color-display)-library
+// https://github.com/kurte/ILI9341_t3n
+// http://forum.pjrc.com/threads/26305-Highly-optimized-ILI9341-(320x240-TFT-color-display)-library
 //
 // Warning this is Kurt's hacked up version whcih allow different SPI busses, which hopefully 
 //         will no longer be reliant on the SPIN library.  
@@ -228,7 +228,8 @@ typedef struct {
 #ifdef __cplusplus
 // At all other speeds, _pspi->beginTransaction() will use the fastest available clock
 
-#define ILI9486_SPICLOCK 80e6 //valid speeds are (120mhz, 80mhz, 60mhz, 48, 40, 34.29, 30mhz, 26.67, 24mhz
+//With a soldered connection between the display and Teensy 80Mhz possible. With a plugged connection only 30Mhz possible
+#define ILI9486_SPICLOCK 80e6 //valid speeds are 120mhz, 80mhz, 60mhz, 48, 40, 34.29, 30mhz, 26.67, 24mhz
 #define ILI9486_SPICLOCK_READ 2000000
 
 
@@ -1154,6 +1155,5 @@ private:
 //#endif
 
 #endif // __cplusplus
-
 
 #endif
