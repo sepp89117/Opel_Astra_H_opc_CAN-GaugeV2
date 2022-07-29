@@ -228,8 +228,13 @@ typedef struct {
 #ifdef __cplusplus
 // At all other speeds, _pspi->beginTransaction() will use the fastest available clock
 
-//With a soldered connection between the display and Teensy 80Mhz possible. With a plugged connection only 30Mhz possible
+//With a soldered connection between the type c display and Teensy 80Mhz possible. With a plugged connection only 30Mhz possible
+#ifdef TYPE_C_DISPLAY
 #define ILI9486_SPICLOCK 80e6 //valid speeds are 120mhz, 80mhz, 60mhz, 48, 40, 34.29, 30mhz, 26.67, 24mhz
+#else
+#define ILI9486_SPICLOCK 30e6 //valid speeds are 120mhz, 80mhz, 60mhz, 48, 40, 34.29, 30mhz, 26.67, 24mhz
+#endif
+
 #define ILI9486_SPICLOCK_READ 2000000
 
 
@@ -240,8 +245,12 @@ class ILI9486_t3n : public Print
 	ILI9486_t3n(uint8_t _CS, uint8_t _DC, uint8_t _RST = 255, 
 		uint8_t _MOSI=11, uint8_t _SCLK=13, uint8_t _MISO=12);
 	void begin(uint32_t spi_clock=ILI9486_SPICLOCK, uint32_t spi_clock_read=ILI9486_SPICLOCK_READ);
-  	void sleep(bool enable);		
-	void pushColor(uint16_t color);
+  
+  void startWrite();
+  void endWrite();
+  
+  void sleep(bool enable);		
+	void pushColor(uint16_t color, bool cont = false);
 	void fillScreen(uint16_t color);
 	inline void fillWindow(uint16_t color) {fillScreen(color);}
 	void drawPixel(int16_t x, int16_t y, uint16_t color);
@@ -257,7 +266,7 @@ class ILI9486_t3n : public Print
 	void setRotation(uint8_t r);
 	void setScroll(uint16_t offset);
 	void invertDisplay(boolean i);
-	void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+	void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, bool cont = false);
 	// Pass 8-bit (each) R,G,B, get back 16-bit packed color
 	static uint16_t color565(uint8_t r, uint8_t g, uint8_t b) {
 		return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
@@ -1155,5 +1164,6 @@ private:
 //#endif
 
 #endif // __cplusplus
+
 
 #endif
