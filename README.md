@@ -2,7 +2,7 @@
 New version, looks like BC from Nissan GT-R and uses large touchscreen
 Needs Waveshare 4inch RPi LCD (C) ILI9486 display and lib
 
-<img src="screenshots/211030_mainScreen.jpg">
+<img src="screenshots/220730_mainScreen.jpg">
 <br>
 Watch demo on https://youtu.be/G2oHpHkk6c8
 <br>
