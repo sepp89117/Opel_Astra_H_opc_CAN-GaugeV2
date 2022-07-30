@@ -11,14 +11,12 @@
 const char bcVersion[] = "2.7 XL";
 
 // Language select - only uncomment one
-//#define DE //Deutsch
-#define EN //English
+#define DE //Deutsch
+//#define EN //English
 //#define FR //France
 //#define RO //Romanian
 
-// Uncomment if you have a Waveshare 4inch RPi LCD (C) ILI9486 display installed
-// Comment out if you have a Waveshare 4inch RPi LCD (A) ILI9486 display installed
-#define TYPE_C_DISPLAY
+// Uncomment '#define TYPE_C_DISPLAY' in 'ILI9486_t3n.h' if you have a Waveshare 4inch RPi LCD (C) ILI9486 display installed or comment out if you have a Waveshare 4inch RPi LCD (A) ILI9486 display installed
 
 // Sends data over serial to PC
 //#define PCOUT
@@ -772,6 +770,7 @@ void drawHeadLine()
 {
   // clear head
   tft.fillRect(0, 0, 129, 33, backColor);
+  tft.fillRect(137, 0, 129, 33, backColor);
   tft.fillRect(351, 0, 129, 33, backColor);
 
   // separator1
@@ -781,49 +780,50 @@ void drawHeadLine()
   tft.drawLine(351, 0, 351, 30, 0xFF4A);
   tft.drawLine(352, 0, 352, 30, 0xFF4A);
 
-  // DEBUG OIL-LEVEL VALUE
-  //   tft.setTextColor(0x87F0);
-  //   tft.setFont(Arial_14);
-  //   tft.setCursor(137, 8);
-  //   tft.print(engOil);
-  // END DEBUG OIL-LEVEL
-
   tft.setTextColor(foreColor);
+  
+  tft.setFont(Arial_12);
+  tft.setCursor(137, 8);
+  tft.print(F("GEAR"));
+  tft.setFont(Arial_14);
+  tft.setCursor(137 + 51, 7);
+  if (!rGang) tft.print(getGear()); //  tft.print((rpm / speed)); // get ratios from gears for ratioMap
+  else tft.print(F("R"));
+
   tft.setFont(Arial_12);
   tft.setCursor(3, 9);
-
   if (!rGang)
   { // Wenn R-Gang nicht drin ist, zeige Batteriespannung
     // battery voltage
-    tft.print("BATT ");
+    tft.print(F("BATT"));
     tft.setFont(Arial_14);
-    tft.setCursor(3 + 46, 8);
+    tft.setCursor(3 + 46, 7);
     tft.print(vBatt);
-    tft.print(" V");
+    tft.print(F(" V"));
   }
   else
   { // Wenn R-Gang drin ist, zeige Abstand
     // distance behind
-    tft.print("DIST ");
+    tft.print(F("DIST"));
     tft.setFont(Arial_14);
-    tft.setCursor(3 + 43, 8);
+    tft.setCursor(3 + 43, 7);
     if (distanceBehind <= 19)
-      tft.print("< 19");
+      tft.print(F("< 19"));
     else if (distanceBehind >= 255)
-      tft.print("> 100");
+      tft.print(F("> 100"));
     else
       tft.print(distanceBehind);
-    tft.print(" cm");
+    tft.print(F(" cm"));
   }
 
   // Außentemperatur
   tft.setFont(Arial_12);
   tft.setCursor(360, 9);
-  tft.print("OUT ");
+  tft.print(F("OUT"));
   tft.setFont(Arial_14);
-  tft.setCursor(412, 8);
+  tft.setCursor(412, 7);
   tft.print(aat, 1);
-  tft.print(" *C");
+  tft.print(F(" *C"));
 }
 
 void drawMaxView()
@@ -1306,7 +1306,7 @@ float getConsum()
 
 float getLambda()
 {
-  float milliVoltMap[3][8] = {
+  float lambdaMilliVoltMap[3][8] = {
       {1000, 980, 945, 830, 100, 40, 25, 20}, // AGT 500°C
       {930, 910, 865, 740, 130, 55, 35, 25},  // AGT 750°C
       {875, 850, 790, 660, 150, 65, 45, 30}}; // AGT 900°C
@@ -1328,42 +1328,66 @@ float getLambda()
 
   float lambdaMilliVolt = lambdaVolt * 1000.0f;
 
-  if (lambdaMilliVolt >= milliVoltMap[tempIndex][0])
+  if (lambdaMilliVolt >= lambdaMilliVoltMap[tempIndex][0])
   {
     return 0.70f;
   }
-  else if (lambdaMilliVolt >= milliVoltMap[tempIndex][1])
+  else if (lambdaMilliVolt >= lambdaMilliVoltMap[tempIndex][1])
   {
-    return map(lambdaMilliVolt, milliVoltMap[tempIndex][1], milliVoltMap[tempIndex][0], 70, 80) / 100.0f;
+    return map(lambdaMilliVolt, lambdaMilliVoltMap[tempIndex][1], lambdaMilliVoltMap[tempIndex][0], 70, 80) / 100.0f;
   }
-  else if (lambdaMilliVolt >= milliVoltMap[tempIndex][2])
+  else if (lambdaMilliVolt >= lambdaMilliVoltMap[tempIndex][2])
   {
-    return map(lambdaMilliVolt, milliVoltMap[tempIndex][2], milliVoltMap[tempIndex][1], 80, 90) / 100.0f;
+    return map(lambdaMilliVolt, lambdaMilliVoltMap[tempIndex][2], lambdaMilliVoltMap[tempIndex][1], 80, 90) / 100.0f;
   }
-  else if (lambdaMilliVolt >= milliVoltMap[tempIndex][3])
+  else if (lambdaMilliVolt >= lambdaMilliVoltMap[tempIndex][3])
   {
-    return map(lambdaMilliVolt, milliVoltMap[tempIndex][3], milliVoltMap[tempIndex][2], 90, 100) / 100.0f;
+    return map(lambdaMilliVolt, lambdaMilliVoltMap[tempIndex][3], lambdaMilliVoltMap[tempIndex][2], 90, 100) / 100.0f;
   }
-  else if (lambdaMilliVolt >= milliVoltMap[tempIndex][4])
+  else if (lambdaMilliVolt >= lambdaMilliVoltMap[tempIndex][4])
   {
     return 1.0f;
   }
-  else if (lambdaMilliVolt >= milliVoltMap[tempIndex][5])
+  else if (lambdaMilliVolt >= lambdaMilliVoltMap[tempIndex][5])
   {
-    return map(lambdaMilliVolt, milliVoltMap[tempIndex][5], milliVoltMap[tempIndex][4], 100, 110) / 100.0f;
+    return map(lambdaMilliVolt, lambdaMilliVoltMap[tempIndex][5], lambdaMilliVoltMap[tempIndex][4], 100, 110) / 100.0f;
   }
-  else if (lambdaMilliVolt >= milliVoltMap[tempIndex][6])
+  else if (lambdaMilliVolt >= lambdaMilliVoltMap[tempIndex][6])
   {
-    return map(lambdaMilliVolt, milliVoltMap[tempIndex][6], milliVoltMap[tempIndex][5], 110, 120) / 100.0f;
+    return map(lambdaMilliVolt, lambdaMilliVoltMap[tempIndex][6], lambdaMilliVoltMap[tempIndex][5], 110, 120) / 100.0f;
   }
-  else if (lambdaMilliVolt >= milliVoltMap[tempIndex][7])
+  else if (lambdaMilliVolt >= lambdaMilliVoltMap[tempIndex][7])
   {
-    return map(lambdaMilliVolt, milliVoltMap[tempIndex][7], milliVoltMap[tempIndex][6], 120, 129) / 100.0f;
+    return map(lambdaMilliVolt, lambdaMilliVoltMap[tempIndex][7], lambdaMilliVoltMap[tempIndex][6], 120, 129) / 100.0f;
   }
   else
   {
     return 1.30f;
   }
+}
+
+uint8_t getGear()
+{
+  if (speed == 0 || rpm < 256 || rGang) return 0;
+
+  // min and max absolute ratio for all gears (calculated with tire size 235/35 R19 and tolerances)
+  uint8_t ratioMap[6][2] = {
+    {112, 142}, // 1. gear = 124.0
+    {63, 81},  // 2. gear = 70.1
+    {41, 53},  // 3. gear = 47.9
+    {30, 38},  // 4. gear = 34.7
+    {26, 29},  // 5. gear = 28.4
+    {21, 25}   // 6. gear = 24.2
+  };
+
+  //Calculate absolute ratio
+  int _ratio = rpm / speed;
+
+  for (uint8_t i = 0; i < 6; i++) {
+    if (_ratio >= ratioMap[i][0] && _ratio <= ratioMap[i][1]) return i + 1;
+  }
+
+  return 0;
 }
 
 float getEngineRunningMinutes()
