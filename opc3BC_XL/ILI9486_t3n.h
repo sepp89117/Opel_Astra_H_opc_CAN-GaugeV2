@@ -64,6 +64,8 @@
 #endif
 #define _SPIN_H_INCLUDED	// try to avoid spin library from loading. 
 
+#define TYPE_C_DISPLAY
+
 #define  ILI9486_USE_DMAMEM
 
 // Allow us to enable or disable capabilities, particully Frame Buffer and Clipping for speed and size
