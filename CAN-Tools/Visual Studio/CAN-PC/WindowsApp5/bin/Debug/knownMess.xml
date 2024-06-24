@@ -1,0 +1,1504 @@
+<?xml version="1.0" standalone="yes"?>
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:MainDataTable="save" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="save">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="CAN-ID" type="xs:string" minOccurs="0" />
+                <xs:element name="Byte1" type="xs:string" minOccurs="0" />
+                <xs:element name="Byte2" type="xs:string" minOccurs="0" />
+                <xs:element name="Byte3" type="xs:string" minOccurs="0" />
+                <xs:element name="Byte4" type="xs:string" minOccurs="0" />
+                <xs:element name="Byte5" type="xs:string" minOccurs="0" />
+                <xs:element name="Byte6" type="xs:string" minOccurs="0" />
+                <xs:element name="Byte7" type="xs:string" minOccurs="0" />
+                <xs:element name="Byte8" type="xs:string" minOccurs="0" />
+                <xs:element name="Byte9" type="xs:string" minOccurs="0" />
+                <xs:element name="Byte10" type="xs:string" minOccurs="0" />
+                <xs:element name="Byte11" type="xs:string" minOccurs="0" />
+                <xs:element name="Byte12" type="xs:string" minOccurs="0" />
+                <xs:element name="Byte13" type="xs:string" minOccurs="0" />
+                <xs:element name="Byte14" type="xs:string" minOccurs="0" />
+                <xs:element name="Byte15" type="xs:string" minOccurs="0" />
+                <xs:element name="Byte16" type="xs:string" minOccurs="0" />
+                <xs:element name="Zähler" type="xs:string" minOccurs="0" />
+                <xs:element name="Name" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <save>
+    <CAN-ID>206</CAN-ID>
+    <Byte1>8</Byte1>
+    <Byte2>93</Byte2>
+    <Byte3>1</Byte3>
+    <Byte4 />
+    <Byte5 />
+    <Byte6 />
+    <Byte7 />
+    <Byte8 />
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>8</Zähler>
+    <Name>95 - Befehl "Radio lauter"</Name>
+  </save>
+  <save>
+    <CAN-ID>206</CAN-ID>
+    <Byte1>8</Byte1>
+    <Byte2>93</Byte2>
+    <Byte3>FF</Byte3>
+    <Byte4 />
+    <Byte5 />
+    <Byte6 />
+    <Byte7 />
+    <Byte8 />
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>6</Zähler>
+    <Name>95 - Befehl "Radio leiser"</Name>
+  </save>
+  <save>
+    <CAN-ID>4E8</CAN-ID>
+    <Byte1>46</Byte1>
+    <Byte2>F</Byte2>
+    <Byte3>0</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>4</Byte7>
+    <Byte8 />
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>201</Zähler>
+    <Name>95 - Signal "R-Gang drin"</Name>
+  </save>
+  <save>
+    <CAN-ID>4F0</CAN-ID>
+    <Byte1>46</Byte1>
+    <Byte2>F</Byte2>
+    <Byte3>0</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6 />
+    <Byte7 />
+    <Byte8 />
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>4</Zähler>
+    <Name>95 - Signal "Wischer wischt"</Name>
+  </save>
+  <save>
+    <CAN-ID>206</CAN-ID>
+    <Byte1>8</Byte1>
+    <Byte2>83</Byte2>
+    <Byte3>FF</Byte3>
+    <Byte4 />
+    <Byte5 />
+    <Byte6 />
+    <Byte7 />
+    <Byte8 />
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>3</Zähler>
+    <Name>95 - Befehl "next track"</Name>
+  </save>
+  <save>
+    <CAN-ID>206</CAN-ID>
+    <Byte1>8</Byte1>
+    <Byte2>83</Byte2>
+    <Byte3>1</Byte3>
+    <Byte4 />
+    <Byte5 />
+    <Byte6 />
+    <Byte7 />
+    <Byte8 />
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>1</Zähler>
+    <Name>95 - Befehl "last track"</Name>
+  </save>
+  <save>
+    <CAN-ID>305</CAN-ID>
+    <Byte1>0</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>0</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>10</Byte5>
+    <Byte6>90</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8 />
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>9</Zähler>
+    <Name>33 - Signal "Licht Automatik"</Name>
+  </save>
+  <save>
+    <CAN-ID>305</CAN-ID>
+    <Byte1>0</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>40</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>10</Byte5>
+    <Byte6>80</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8 />
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>5</Zähler>
+    <Name>33 - Signal "Standlicht an"</Name>
+  </save>
+  <save>
+    <CAN-ID>305</CAN-ID>
+    <Byte1>0</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>0</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>10</Byte5>
+    <Byte6>80</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8 />
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>5</Zähler>
+    <Name>33 - Signal "Licht aus"</Name>
+  </save>
+  <save>
+    <CAN-ID>305</CAN-ID>
+    <Byte1>0</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>C0</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>10</Byte5>
+    <Byte6>80</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8 />
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>5</Zähler>
+    <Name>33 - Signal "Abblendlicht an"</Name>
+  </save>
+  <save>
+    <CAN-ID>175</CAN-ID>
+    <Byte1>8</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>0</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>4</Zähler>
+    <Name>33 - Befehl "Aufblendlicht an"</Name>
+  </save>
+  <save>
+    <CAN-ID>175</CAN-ID>
+    <Byte1>0</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>2</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>2</Zähler>
+    <Name>33 - Befehl "3x R Blinken"</Name>
+  </save>
+  <save>
+    <CAN-ID>175</CAN-ID>
+    <Byte1>0</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>1</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>1</Zähler>
+    <Name>33 - Befehl "3x L Blinken"</Name>
+  </save>
+  <save>
+    <CAN-ID>175</CAN-ID>
+    <Byte1>0</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>4</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>2</Zähler>
+    <Name>33 - Befehl "Blinker R an"</Name>
+  </save>
+  <save>
+    <CAN-ID>175</CAN-ID>
+    <Byte1>0</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>3</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>2</Zähler>
+    <Name>33 - Befehl "Blinker L an"</Name>
+  </save>
+  <save>
+    <CAN-ID>175</CAN-ID>
+    <Byte1>0</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>0</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>1</Zähler>
+    <Name>33 - Befehl "Alles aus (Wischer, Spritzwasser, Aufblendlicht)"</Name>
+  </save>
+  <save>
+    <CAN-ID>175</CAN-ID>
+    <Byte1>4</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>0</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>1</Zähler>
+    <Name>33 - Befehl "Spritzwasser vorne an"</Name>
+  </save>
+  <save>
+    <CAN-ID>175</CAN-ID>
+    <Byte1>0</Byte1>
+    <Byte2>A</Byte2>
+    <Byte3>0</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>1</Zähler>
+    <Name>33 - Befehl "Wischer hinten an"</Name>
+  </save>
+  <save>
+    <CAN-ID>175</CAN-ID>
+    <Byte1>2</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>0</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>1</Zähler>
+    <Name>33 - Befehl "Spritzwasser hinten an"</Name>
+  </save>
+  <save>
+    <CAN-ID>175</CAN-ID>
+    <Byte1>0</Byte1>
+    <Byte2>10</Byte2>
+    <Byte3>0</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>1</Zähler>
+    <Name>33 - Befehl "Wischen Stufe 1"</Name>
+  </save>
+  <save>
+    <CAN-ID>175</CAN-ID>
+    <Byte1>0</Byte1>
+    <Byte2>D0</Byte2>
+    <Byte3>0</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>1</Zähler>
+    <Name>33 - Befehl "Wischen Stufe 2"</Name>
+  </save>
+  <save>
+    <CAN-ID>175</CAN-ID>
+    <Byte1>0</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>8</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>1</Zähler>
+    <Name>33 - Befehl "Wischer aus"</Name>
+  </save>
+  <save>
+    <CAN-ID>175</CAN-ID>
+    <Byte1>0</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>0</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>2</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>1F</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>2</Zähler>
+    <Name>33 - Befehl "Radio leiser (Fernbedienung)"</Name>
+  </save>
+  <save>
+    <CAN-ID>175</CAN-ID>
+    <Byte1>0</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>0</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>1</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>1</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>2</Zähler>
+    <Name>33 - Befehl "Radio lauter (Fernbedienung)"</Name>
+  </save>
+  <save>
+    <CAN-ID>115</CAN-ID>
+    <Byte1>C</Byte1>
+    <Byte2 />
+    <Byte3 />
+    <Byte4 />
+    <Byte5 />
+    <Byte6 />
+    <Byte7 />
+    <Byte8 />
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>25</Zähler>
+    <Name>33 - Befehl "Bremslicht an"</Name>
+  </save>
+  <save>
+    <CAN-ID>300</CAN-ID>
+    <Byte1>41</Byte1>
+    <Byte2>10</Byte2>
+    <Byte3>0</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5 />
+    <Byte6 />
+    <Byte7 />
+    <Byte8 />
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>6</Zähler>
+    <Name>33 - Signal "Kupplung getreten"</Name>
+  </save>
+  <save>
+    <CAN-ID>165</CAN-ID>
+    <Byte1>1</Byte1>
+    <Byte2>10</Byte2>
+    <Byte3>0</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>25</Byte7>
+    <Byte8>2B</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>8</Zähler>
+    <Name>33 - Befehl "aufschließen"</Name>
+  </save>
+  <save>
+    <CAN-ID>165</CAN-ID>
+    <Byte1>1</Byte1>
+    <Byte2>40</Byte2>
+    <Byte3>0</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>25</Byte7>
+    <Byte8>2B</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>9</Zähler>
+    <Name>33 - Befehl "zuschließen"</Name>
+  </save>
+  <save>
+    <CAN-ID>625</CAN-ID>
+    <Byte1>0</Byte1>
+    <Byte2>48</Byte2>
+    <Byte3>50</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>365</Zähler>
+    <Name>33 - Signal "Zündung ist an"</Name>
+  </save>
+  <save>
+    <CAN-ID>6C1</CAN-ID>
+    <Byte1>10</Byte1>
+    <Byte2>54</Byte2>
+    <Byte3>C0</Byte3>
+    <Byte4>00</Byte4>
+    <Byte5>51</Byte5>
+    <Byte6>03</Byte6>
+    <Byte7>01</Byte7>
+    <Byte8>01</Byte8>
+    <Name>95 - Befehl "Display: 84 Bytes, mode 0xC000, 81 Bytes payload, type 0x03, id 0x01, 1 char"</Name>
+  </save>
+  <save>
+    <CAN-ID>6C1</CAN-ID>
+    <Byte1>21</Byte1>
+    <Byte2>00</Byte2>
+    <Byte3>20</Byte3>
+    <Byte4>02</Byte4>
+    <Byte5>03</Byte5>
+    <Byte6>00</Byte6>
+    <Byte7>41</Byte7>
+    <Byte8>00</Byte8>
+    <Name>95 - Befehl "Display: Whitespace, id 0x02, A"</Name>
+  </save>
+  <save>
+    <CAN-ID>6C1</CAN-ID>
+    <Byte1>22</Byte1>
+    <Byte2>75</Byte2>
+    <Byte3>00</Byte3>
+    <Byte4>78</Byte4>
+    <Byte5>10</Byte5>
+    <Byte6>07</Byte6>
+    <Byte7>00</Byte7>
+    <Byte8>48</Byte8>
+    <Name>95 - Befehl"Display: u x, mode 0x10, 7 chars, H"</Name>
+  </save>
+  <save>
+    <CAN-ID>6C1</CAN-ID>
+    <Byte1>23</Byte1>
+    <Byte2>00</Byte2>
+    <Byte3>61</Byte3>
+    <Byte4>00</Byte4>
+    <Byte5>63</Byte5>
+    <Byte6>00</Byte6>
+    <Byte7>6B</Byte7>
+    <Byte8>00</Byte8>
+    <Name>95 - Begehl "Display: a, c, k"</Name>
+  </save>
+  <save>
+    <CAN-ID>6C1</CAN-ID>
+    <Byte1>24</Byte1>
+    <Byte2>65</Byte2>
+    <Byte3>00</Byte3>
+    <Byte4>64</Byte4>
+    <Byte5>00</Byte5>
+    <Byte6>21</Byte6>
+    <Byte7>00</Byte7>
+    <Byte8>00</Byte8>
+    <Name>95 - Befehl "e, d, !"</Name>
+  </save>
+  <save>
+    <CAN-ID>248</CAN-ID>
+    <Byte1>06</Byte1>
+    <Byte2>AA</Byte2>
+    <Byte3>01</Byte3>
+    <Byte4>01</Byte4>
+    <Byte5>07</Byte5>
+    <Byte6>10</Byte6>
+    <Byte7>11</Byte7>
+    <Name>95 - Frage "Ask the A/C controller (0x0248) for measuringblocks 01, 07, 10 and 11"</Name>
+  </save>
+  <save>
+    <CAN-ID>548</CAN-ID>
+    <Byte1>01</Byte1>
+    <Byte2>03</Byte2>
+    <Byte3>A5</Byte3>
+    <Byte4>00</Byte4>
+    <Byte5>00</Byte5>
+    <Byte6>01</Byte6>
+    <Byte7>9C</Byte7>
+    <Byte8>00</Byte8>
+    <Name>95 - Antwort "01: 0x03A5: Solar sensor: 4.665V - 0x019C: Indoor temp sensor: 2.06V"</Name>
+  </save>
+  <save>
+    <CAN-ID>548</CAN-ID>
+    <Byte1>07</Byte1>
+    <Byte2>00</Byte2>
+    <Byte3>90</Byte3>
+    <Byte4>04</Byte4>
+    <Byte5>3D</Byte5>
+    <Byte6>FE</Byte6>
+    <Byte7>70</Byte7>
+    <Byte8>00</Byte8>
+    <Name>95 - Antwort "07: 0x90: Voltage: 14.4V"</Name>
+  </save>
+  <save>
+    <CAN-ID>548</CAN-ID>
+    <Byte1>10</Byte1>
+    <Byte2>00</Byte2>
+    <Byte3>91</Byte3>
+    <Byte4>02</Byte4>
+    <Byte5>B2</Byte5>
+    <Byte6>03</Byte6>
+    <Byte7>1E</Byte7>
+    <Byte8>96</Byte8>
+    <Name>95 - Antwort "10: 0x0091: Out-temp: 14.5°C - 0x02B2: Engine temp: 69.0°C"</Name>
+  </save>
+  <save>
+    <CAN-ID>548</CAN-ID>
+    <Byte1>11</Byte1>
+    <Byte2>08</Byte2>
+    <Byte3>ED</Byte3>
+    <Byte4>00</Byte4>
+    <Byte5>30</Byte5>
+    <Byte6>01</Byte6>
+    <Byte7>FE</Byte7>
+    <Byte8>23</Byte8>
+    <Name>95 - Antwort "11: 0x08ED: RPM: 2285 - 0x30: Speed: 48 km/h - 0x23: LED: 35%"</Name>
+  </save>
+  <save>
+    <CAN-ID>235</CAN-ID>
+    <Byte1>235</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>FF</Byte3>
+    <Byte8 />
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>9</Zähler>
+    <Name>33 - Befehl "Display Beleuchtung 100%"</Name>
+  </save>
+  <save>
+    <CAN-ID>235</CAN-ID>
+    <Byte1>235</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>0</Byte3>
+    <Byte8 />
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>9</Zähler>
+    <Name>33 - Befehl "Display Beleuchtung 0%"</Name>
+  </save>
+  <save>
+    <CAN-ID>235</CAN-ID>
+    <Byte1>235</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>7F</Byte3>
+    <Byte8 />
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>9</Zähler>
+    <Name>33 - Befehl "Display Beleuchtung 50%"</Name>
+  </save>
+  <save>
+    <CAN-ID>170</CAN-ID>
+    <Byte1>55</Byte1>
+    <Byte2>55</Byte2>
+    <Byte3>55</Byte3>
+    <Byte8 />
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>9</Zähler>
+    <Name>33 - Befehl "Instrument an"</Name>
+  </save>
+  <save>
+    <CAN-ID>305</CAN-ID>
+    <Byte1>0</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>0</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>10</Byte5>
+    <Byte6>90</Byte6>
+    <Byte7>1</Byte7>
+    <Byte8 />
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>8</Zähler>
+    <Name>33 - Befehl "Türver-/entriegeln von innen"</Name>
+  </save>
+  <save>
+    <CAN-ID>5E8</CAN-ID>
+    <Byte1>81</Byte1>
+    <Byte2>00</Byte2>
+    <Byte3>00</Byte3>
+    <Byte4>00</Byte4>
+    <Byte5>FF</Byte5>
+    <Byte6>00</Byte6>
+    <Byte7>00</Byte7>
+    <Byte8>00</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>9</Zähler>
+    <Name>33 - Befehl "000000 im Instrumentendisplay anzeigen"</Name>
+  </save>
+  <save>
+    <CAN-ID>5E8</CAN-ID>
+    <Byte1>81</Byte1>
+    <Byte2>00</Byte2>
+    <Byte3>80</Byte3>
+    <Byte4>EC</Byte4>
+    <Byte5>FF</Byte5>
+    <Byte6>00</Byte6>
+    <Byte7>00</Byte7>
+    <Byte8>00</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>9</Zähler>
+    <Name>33 - Befehl "000000 im Instrumentendisplay anzeigen"</Name>
+  </save>
+  <save>
+    <CAN-ID>300</CAN-ID>
+    <Byte1>41</Byte1>
+    <Byte2>40</Byte2>
+    <Byte3>0</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5 />
+    <Byte6 />
+    <Byte7 />
+    <Byte8 />
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>2</Zähler>
+    <Name>33 - Befehl "Zündung ausschalten"</Name>
+  </save>
+  <save>
+    <CAN-ID>108</CAN-ID>
+    <Byte1>00</Byte1>
+    <Byte2>FF</Byte2>
+    <Byte3>00</Byte3>
+    <Byte4>00</Byte4>
+    <Byte5>FF</Byte5>
+    <Byte6>00</Byte6>
+    <Byte7>00</Byte7>
+    <Byte8>1E</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>8</Zähler>
+    <Name>33 - Befehl "full sweep"</Name>
+  </save>
+  <save>
+    <CAN-ID>145</CAN-ID>
+    <Byte1>60</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>44</Byte3>
+    <Byte4>4F</Byte4>
+    <Byte5>C8</Byte5>
+    <Byte6>4</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>63</Zähler>
+    <Name>33 - Info Coolant (Byte4 / 2 =39,5°C)</Name>
+  </save>
+  <save>
+    <CAN-ID>145</CAN-ID>
+    <Byte1>60</Byte1>
+    <Byte2>0</Byte2>
+    <Byte3>44</Byte3>
+    <Byte4>50</Byte4>
+    <Byte5>C8</Byte5>
+    <Byte6>4</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>63</Zähler>
+    <Name>33 - Info Coolant (Byte4 / 2 =40°C)</Name>
+  </save>
+  <save>
+    <CAN-ID>380</CAN-ID>
+    <Byte1>B0</Byte1>
+    <Byte2>BA</Byte2>
+    <Byte3>5E</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>C1</Byte5>
+    <Byte6>F3</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>98</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>27</Zähler>
+    <Name>esp off 1</Name>
+  </save>
+  <save>
+    <CAN-ID>380</CAN-ID>
+    <Byte1>E0</Byte1>
+    <Byte2>BA</Byte2>
+    <Byte3>5E</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>C1</Byte5>
+    <Byte6>F3</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>98</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>45</Zähler>
+    <Name>esp off 2</Name>
+  </save>
+  <save>
+    <CAN-ID>380</CAN-ID>
+    <Byte1>30</Byte1>
+    <Byte2>BA</Byte2>
+    <Byte3>5E</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>C1</Byte5>
+    <Byte6>F3</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>98</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>43</Zähler>
+    <Name>esp off 3</Name>
+  </save>
+  <save>
+    <CAN-ID>380</CAN-ID>
+    <Byte1>60</Byte1>
+    <Byte2>BA</Byte2>
+    <Byte3>5E</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>C1</Byte5>
+    <Byte6>F3</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>98</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>50</Zähler>
+    <Name>esp off 4</Name>
+  </save>
+  <save>
+    <CAN-ID>120</CAN-ID>
+    <Byte1>0</Byte1>
+    <Byte2>54</Byte2>
+    <Byte3>36</Byte3>
+    <Byte4>C0</Byte4>
+    <Byte5>46</Byte5>
+    <Byte6>6C</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>110</Zähler>
+    <Name>500k byte 4 Gaspedal max = c0</Name>
+  </save>
+  <save>
+    <CAN-ID>120</CAN-ID>
+    <Byte1>0</Byte1>
+    <Byte2>52</Byte2>
+    <Byte3>B3</Byte3>
+    <Byte4>20</Byte4>
+    <Byte5>46</Byte5>
+    <Byte6>6C</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>4085</Zähler>
+    <Name>500k, byte 4 = gaspedal, 20 = min</Name>
+  </save>
+  <save>
+    <CAN-ID>381</CAN-ID>
+    <Byte1>1</Byte1>
+    <Byte2>98</Byte2>
+    <Byte3>15</Byte3>
+    <Byte4>5</Byte4>
+    <Byte5>16</Byte5>
+    <Byte6>73</Byte6>
+    <Byte7>43</Byte7>
+    <Byte8>4</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>22</Zähler>
+    <Name>500k sport an</Name>
+  </save>
+  <save>
+    <CAN-ID>380</CAN-ID>
+    <Byte1>60</Byte1>
+    <Byte2>BA</Byte2>
+    <Byte3>65</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>FF</Byte5>
+    <Byte6>F3</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>98</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>19</Zähler>
+    <Name>500k esp off 1</Name>
+  </save>
+  <save>
+    <CAN-ID>380</CAN-ID>
+    <Byte1>30</Byte1>
+    <Byte2>BA</Byte2>
+    <Byte3>65</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>FF</Byte5>
+    <Byte6>F3</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>98</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>17</Zähler>
+    <Name>500k esp off 2</Name>
+  </save>
+  <save>
+    <CAN-ID>380</CAN-ID>
+    <Byte1>B0</Byte1>
+    <Byte2>BA</Byte2>
+    <Byte3>65</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>FF</Byte5>
+    <Byte6>F3</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>98</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>25</Zähler>
+    <Name>500k esp off 3</Name>
+  </save>
+  <save>
+    <CAN-ID>380</CAN-ID>
+    <Byte1>E0</Byte1>
+    <Byte2>BA</Byte2>
+    <Byte3>65</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>FF</Byte5>
+    <Byte6>F3</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>98</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>23</Zähler>
+    <Name>500k esp off 4</Name>
+  </save>
+  <save>
+    <CAN-ID>300</CAN-ID>
+    <Byte1>0</Byte1>
+    <Byte2>4</Byte2>
+    <Byte3>47</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>40</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>31</Zähler>
+    <Name>500k, byte 5 = kpl-pedal, 40 = getreten, 0 = nicht getreten</Name>
+  </save>
+  <save>
+    <CAN-ID>300</CAN-ID>
+    <Byte1>30</Byte1>
+    <Byte2>4</Byte2>
+    <Byte3>47</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>9</Zähler>
+    <Name>500k, byte 1 = bremspedal, 30 = an, 0 = aus</Name>
+  </save>
+  <save>
+    <CAN-ID>380</CAN-ID>
+    <Byte1>B0</Byte1>
+    <Byte2>BA</Byte2>
+    <Byte3>66</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>FF</Byte5>
+    <Byte6>F3</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>80</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>5</Zähler>
+    <Name>500k, byte 8 = handbremse, 80 = an, 0 = aus</Name>
+  </save>
+  <save>
+    <CAN-ID>381</CAN-ID>
+    <Byte1>1</Byte1>
+    <Byte2>9B</Byte2>
+    <Byte3>5</Byte3>
+    <Byte4>5</Byte4>
+    <Byte5>12</Byte5>
+    <Byte6>73</Byte6>
+    <Byte7>40</Byte7>
+    <Byte8>4</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>134</Zähler>
+    <Name>500k sport aus</Name>
+  </save>
+  <save>
+    <CAN-ID>381</CAN-ID>
+    <Byte1>1</Byte1>
+    <Byte2>9B</Byte2>
+    <Byte3>15</Byte3>
+    <Byte4>5</Byte4>
+    <Byte5>16</Byte5>
+    <Byte6>73</Byte6>
+    <Byte7>43</Byte7>
+    <Byte8>4</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>28</Zähler>
+    <Name>500k sport an</Name>
+  </save>
+  <save>
+    <CAN-ID>206</CAN-ID>
+    <Byte1>8</Byte1>
+    <Byte2>83</Byte2>
+    <Byte3>1</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>1</Zähler>
+    <Name>95kbps bc-down</Name>
+  </save>
+  <save>
+    <CAN-ID>206</CAN-ID>
+    <Byte1>8</Byte1>
+    <Byte2>83</Byte2>
+    <Byte3>FF</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>1</Zähler>
+    <Name>95kbps bc-up</Name>
+  </save>
+  <save>
+    <CAN-ID>206</CAN-ID>
+    <Byte1>1</Byte1>
+    <Byte2>84</Byte2>
+    <Byte3>0</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>1</Zähler>
+    <Name>95kbps bc-enter</Name>
+  </save>
+  <save>
+    <CAN-ID>2B0</CAN-ID>
+    <Byte1>46</Byte1>
+    <Byte2>B</Byte2>
+    <Byte3>8</Byte3>
+    <Byte4>3C</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>84</Zähler>
+    <Name>95 waschwasser leer</Name>
+  </save>
+  <save>
+    <CAN-ID>2B0</CAN-ID>
+    <Byte1>46</Byte1>
+    <Byte2>4</Byte2>
+    <Byte3>8</Byte3>
+    <Byte4>6</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>348</Zähler>
+    <Name>95 waschwasser voll</Name>
+  </save>
+  <save>
+    <CAN-ID>683</CAN-ID>
+    <Byte1>46</Byte1>
+    <Byte2>1</Byte2>
+    <Byte3>63</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>A1</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>2</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>13</Zähler>
+    <Name>9,5 C byte3 (62=9C)</Name>
+  </save>
+  <save>
+    <CAN-ID>683</CAN-ID>
+    <Byte1>46</Byte1>
+    <Byte2>1</Byte2>
+    <Byte3>63</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>A4</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>3</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>9</Zähler>
+    <Name>9,5 C2</Name>
+  </save>
+  <save>
+    <CAN-ID>683</CAN-ID>
+    <Byte1>46</Byte1>
+    <Byte2>1</Byte2>
+    <Byte3>63</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>63</Zähler>
+    <Name>9,5 C3</Name>
+  </save>
+  <save>
+    <CAN-ID>683</CAN-ID>
+    <Byte1>46</Byte1>
+    <Byte2>1</Byte2>
+    <Byte3>64</Byte3>
+    <Byte4>0</Byte4>
+    <Byte5>0</Byte5>
+    <Byte6>0</Byte6>
+    <Byte7>0</Byte7>
+    <Byte8>0</Byte8>
+    <Byte9 />
+    <Byte10 />
+    <Byte11 />
+    <Byte12 />
+    <Byte13 />
+    <Byte14 />
+    <Byte15 />
+    <Byte16 />
+    <Zähler>12</Zähler>
+    <Name>10C außen byte 3</Name>
+  </save>
+</NewDataSet>

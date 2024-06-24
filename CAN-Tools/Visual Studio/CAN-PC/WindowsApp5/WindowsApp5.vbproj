@@ -1,0 +1,225 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{51294E00-3815-4449-94B3-C7A51C7DD88C}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>WindowsApp5.My.MyApplication</StartupObject>
+    <RootNamespace>WindowsApp5</RootNamespace>
+    <AssemblyName>WindowsApp5</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>WindowsForms</MyType>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>WindowsApp5.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>WindowsApp5.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.Shell.15.0, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Windows.Forms" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+    <Import Include="System.Threading.Tasks" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="displayForm.Designer.vb">
+      <DependentUpon>displayForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="displayForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="filter.Designer.vb">
+      <DependentUpon>filter.vb</DependentUpon>
+    </Compile>
+    <Compile Include="filter.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormMain.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormMain.Designer.vb">
+      <DependentUpon>FormMain.vb</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormConn.Designer.vb">
+      <DependentUpon>FormConn.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FormConn.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormEditMes.Designer.vb">
+      <DependentUpon>FormEditMes.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FormEditMes.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="saveList.Designer.vb">
+      <DependentUpon>saveList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="saveList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="sketchInfo.Designer.vb">
+      <DependentUpon>sketchInfo.vb</DependentUpon>
+    </Compile>
+    <Compile Include="sketchInfo.vb">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="displayForm.resx">
+      <DependentUpon>displayForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="filter.resx">
+      <DependentUpon>filter.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormMain.resx">
+      <DependentUpon>FormMain.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormConn.resx">
+      <DependentUpon>FormConn.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormEditMes.resx">
+      <DependentUpon>FormEditMes.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="saveList.resx">
+      <DependentUpon>saveList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="sketchInfo.resx">
+      <DependentUpon>sketchInfo.vb</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\if_plug_red_69175.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\if_plug_green_68983.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\OBD2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\if_open-file_85334.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\if_floppy_285657.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\if_edit-clear_29769.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\if_edit-clear_black.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\if_Sticky_12873.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\if_03_171510.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\if_settings_115801.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\if_filter_%28add%29_16x16_9832.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\if_filter_%28delete%29_16x16_9833.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\if_filter_%28add id%29.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\if_filter_%28add b%29.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\arducode.html" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+</Project>
